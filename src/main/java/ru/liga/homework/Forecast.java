@@ -21,7 +21,6 @@ public class Forecast {
                 date.plusDays(1) ,
                 courseTomorrow = courseTomorrow .divide(devisor , 2 , BigDecimal.ROUND_HALF_UP) ,
                 currency);
-        System.out.println(rateTomorrow);
         return rateTomorrow;
     }
 

@@ -24,13 +24,13 @@ public class FileReader {
         String path = "";
         switch (currency.toUpperCase()) {
             case "EUR":
-                path = "src/main/resources/eur.csv";
+                path = "eur.csv";
                 break;
             case "USD":
-                path = "src/main/resources/try.csv";
+                path = "try.csv";
                 break;
             case "TRY":
-                path = "src/main/resources/usd.csv";
+                path = "usd.csv";
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + currency);

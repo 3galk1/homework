@@ -32,7 +32,6 @@ public class Forecast {
             rate.add(0 , currentRate);
             rate.remove(rate.size() - 1);
         }
-        System.out.println(rate);
         return rate;
     }
 

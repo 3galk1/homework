@@ -27,10 +27,10 @@ public class FileReader {
                 path = "eur.csv";
                 break;
             case "USD":
-                path = "try.csv";
+                path = "usd.csv";
                 break;
             case "TRY":
-                path = "usd.csv";
+                path = "try.csv";
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + currency);

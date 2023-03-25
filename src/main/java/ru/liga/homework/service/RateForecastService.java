@@ -6,14 +6,12 @@ import ru.liga.homework.model.type.TimeRange;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.util.List;
 
 public class RateForecastService {
 
     private BigDecimal divisor = new BigDecimal(7);
-    private BigDecimal sumCourse = new BigDecimal(0);
 
     public List<CurrencyRate> calculateRate(List<CurrencyRate> rates , CommandForUse command) {
         if (command.getTimeRange() == 1) {

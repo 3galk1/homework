@@ -1,33 +1,16 @@
-package ru.liga.homework;
+package ru.liga.homework.model;
+
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Getter
 public class CurrencyRate {
-    private int nominal;
-    private String currency;
-    private LocalDate date;
-    private BigDecimal course;
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public int getNominal() {
-        return nominal;
-    }
-
-    public BigDecimal getCourse() {
-        return course;
-    }
+    private final int nominal;
+    private final String currency;
+    private final LocalDate date;
+    private final BigDecimal course;
 
     public CurrencyRate (int nominal, LocalDate date, BigDecimal course, String currency) {
         this.nominal = nominal;
@@ -35,8 +18,6 @@ public class CurrencyRate {
         this.course = course;
         this.currency = currency;
     }
-
-
 
     @Override
     public String toString() {

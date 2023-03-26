@@ -33,7 +33,7 @@
             </descriptorRefs>
             <archive>
                 <manifest>
-                    <mainClass>CurrencyRateApp</mainClass>
+                    <mainClass>App</mainClass>
                 </manifest>
             </archive>
             <!--Ignoring postfix jar-with-dependencies-->

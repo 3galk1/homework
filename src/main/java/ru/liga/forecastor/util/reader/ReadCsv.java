@@ -1,31 +1,23 @@
-package ru.liga.homework.util;
+package ru.liga.forecastor.util.reader;
 
-import ru.liga.homework.model.Command;
-import ru.liga.homework.model.type.TimeRange;
+import ru.liga.forecastor.model.type.Range;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
+public class ReadCsv {
 
-public class Reader {
-
-    public String readCommand() {
-        System.out.println("Введите команду:");
-        Scanner in = new Scanner(System.in);
-        return in.nextLine();
-    }
-
-    public List<String> readCsv(Command command) {
+    public static List<String> readCsv(String path, Range readRange) {
         try {
             List<String> dataFromCsv = new ArrayList<>();
-            BufferedReader csvReader = new BufferedReader(new FileReader(command.getCurrency().getValue()));
+            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+            InputStream input = classloader.getResourceAsStream(path);
+            InputStreamReader streamReader = new InputStreamReader(input, StandardCharsets.UTF_8);
+            BufferedReader csvReader = new BufferedReader(streamReader);
             csvReader.readLine(); //чтение первой строки с Headers
-            for (int i = 0; i < TimeRange.WEEK.getValue(); i++) {
+            for (int i = 0; i < readRange.getValue(); i++) {
                 dataFromCsv.add(csvReader.readLine());
             }
             return dataFromCsv;

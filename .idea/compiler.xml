@@ -9,18 +9,18 @@
         <outputRelativeToContentRoot value="true" />
         <module name="homework_1" />
       </profile>
-      <profile name="Annotation profile for homework_1" enabled="true">
+      <profile name="Annotation profile for forecastor" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.20/lombok-1.18.20.jar" />
         </processorPath>
-        <module name="homework" />
+        <module name="forecastor" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="homework" target="11" />
+      <module name="forecastor" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

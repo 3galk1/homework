@@ -1,6 +1,11 @@
-Main.class
-ru\liga\homework\FileReader.class
-ru\liga\homework\CurrencyRate.class
-ru\liga\homework\Parser.class
-ru\liga\homework\Forecast.class
-ru\liga\homework\Formation.class
+ru\liga\forecastor\util\RatePrint.class
+ru\liga\forecastor\util\reader\ReadCsv.class
+ru\liga\forecastor\service\CurrencyRateApp.class
+ru\liga\forecastor\model\CurrencyRate.class
+App.class
+ru\liga\forecastor\service\Forecast.class
+ru\liga\forecastor\model\type\Range.class
+ru\liga\forecastor\model\type\Currency.class
+ru\liga\forecastor\model\Command.class
+ru\liga\forecastor\service\Parse.class
+ru\liga\forecastor\util\reader\ReadCommand.class

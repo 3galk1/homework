@@ -1,6 +1,11 @@
-C:\JAVA\homework\homework_1\src\main\java\Main.java
-C:\JAVA\homework\homework_1\src\main\java\ru\liga\homework\FileReader.java
-C:\JAVA\homework\homework_1\src\main\java\ru\liga\homework\Parser.java
-C:\JAVA\homework\homework_1\src\main\java\ru\liga\homework\CurrencyRate.java
-C:\JAVA\homework\homework_1\src\main\java\ru\liga\homework\Formation.java
-C:\JAVA\homework\homework_1\src\main\java\ru\liga\homework\Forecast.java
+C:\JAVA\homework\src\main\java\App.java
+C:\JAVA\homework\src\main\java\ru\liga\forecastor\service\Forecast.java
+C:\JAVA\homework\src\main\java\ru\liga\forecastor\service\CurrencyRateApp.java
+C:\JAVA\homework\src\main\java\ru\liga\forecastor\service\Parse.java
+C:\JAVA\homework\src\main\java\ru\liga\forecastor\model\type\Range.java
+C:\JAVA\homework\src\main\java\ru\liga\forecastor\util\RatePrint.java
+C:\JAVA\homework\src\main\java\ru\liga\forecastor\util\reader\ReadCommand.java
+C:\JAVA\homework\src\main\java\ru\liga\forecastor\util\reader\ReadCsv.java
+C:\JAVA\homework\src\main\java\ru\liga\forecastor\model\Command.java
+C:\JAVA\homework\src\main\java\ru\liga\forecastor\model\CurrencyRate.java
+C:\JAVA\homework\src\main\java\ru\liga\forecastor\model\type\Currency.java

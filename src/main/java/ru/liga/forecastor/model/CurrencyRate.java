@@ -1,10 +1,12 @@
-package ru.liga.homework.model;
+package ru.liga.forecastor.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@AllArgsConstructor
 @Getter
 public class CurrencyRate {
     private final int nominal;

@@ -11,7 +11,7 @@ import java.util.List;
 
 public class RatePrint {
     public static void ratePrint(List<CurrencyRate> data, Command command) {
-        for (int i = command.getTimeRange().getDays(); i > 0; i--) {
+        for (int i = command.getTimeRange().getDays()-1; i >= 0; i--) {
             CurrencyRate rate = data.get(i);
             BigDecimal normalizedRate = convertToRealCourse(rate.getNominal(), rate.getCourse());
             String date = DateTimeFormatter.ofPattern("E dd.MM.yyyy").format(rate.getDate());

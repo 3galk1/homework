@@ -1,4 +1,4 @@
-package ru.liga.forecastor.model.type;
+package ru.liga.forecaster.model.type;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +10,7 @@ public enum Currency {
     TRY("try.csv"),
     USD("usd.csv");
 
-    private String value;
+    private String filePath;
+
 
 }

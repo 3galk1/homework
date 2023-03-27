@@ -1,4 +1,4 @@
-package ru.liga.forecastor.model;
+package ru.liga.forecaster.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,20 +14,10 @@ public class CurrencyRate {
     private final LocalDate date;
     private final BigDecimal course;
 
-    public CurrencyRate (int nominal, LocalDate date, BigDecimal course, String currency) {
+    public CurrencyRate(int nominal, LocalDate date, BigDecimal course, String currency) {
         this.nominal = nominal;
         this.date = date;
         this.course = course;
         this.currency = currency;
-    }
-
-    @Override
-    public String toString() {
-        return "CurrencyRate{" +
-                ", nominal='" + nominal + '\'' +
-                "date='" + date + '\'' +
-                ", course='" + course + '\'' +
-                ", currency='" + currency + '\'' +
-                '}';
     }
 }

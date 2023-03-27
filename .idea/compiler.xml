@@ -16,11 +16,11 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.20/lombok-1.18.20.jar" />
         </processorPath>
-        <module name="forecastor" />
+        <module name="forecaster" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="forecastor" target="11" />
+      <module name="forecaster" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

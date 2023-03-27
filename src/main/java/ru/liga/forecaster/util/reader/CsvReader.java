@@ -1,13 +1,13 @@
-package ru.liga.forecastor.util.reader;
+package ru.liga.forecaster.util.reader;
 
-import ru.liga.forecastor.model.type.Range;
+import ru.liga.forecaster.model.type.Range;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReadCsv {
+public class CsvReader {
 
     public static List<String> readCsv(String path, Range readRange) {
         try {
@@ -17,7 +17,7 @@ public class ReadCsv {
             InputStreamReader streamReader = new InputStreamReader(input, StandardCharsets.UTF_8);
             BufferedReader csvReader = new BufferedReader(streamReader);
             csvReader.readLine(); //чтение первой строки с Headers
-            for (int i = 0; i < readRange.getValue(); i++) {
+            for (int i = 0; i < readRange.getDays(); i++) {
                 dataFromCsv.add(csvReader.readLine());
             }
             return dataFromCsv;

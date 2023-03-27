@@ -1,4 +1,4 @@
-package ru.liga.forecastor.model.type;
+package ru.liga.forecaster.model.type;
 
 
 import lombok.AllArgsConstructor;
@@ -11,6 +11,6 @@ public enum Range {
     WEEK(7),
     RATE_RANGE(7);
 
-    private int value;
+    private int days;
 
 }

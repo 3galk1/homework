@@ -10,19 +10,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class RatePrint {
-    public static void ratePrint(List<CurrencyRate> data, Command command) {
-        for (int i = command.getTimeRange().getDays()-1; i >= 0; i--) {
+    public static void ratePrint(List<CurrencyRate> data , Command command) {
+        for (int i = command.getTimeRange().getDays() - 1; i >= 0; i--) {
             CurrencyRate rate = data.get(i);
-            BigDecimal normalizedRate = convertToRealCourse(rate.getNominal(), rate.getCourse());
+            BigDecimal normalizedRate = convertToRealCourse(rate.getNominal() , rate.getCourse());
             String date = DateTimeFormatter.ofPattern("E dd.MM.yyyy").format(rate.getDate());
-            String formattedRate = normalizedRate.toString().replace(".", ",");
-            System.out.println(String.join(" - ", date, formattedRate));
+            String formattedRate = normalizedRate.toString().replace("." , ",");
+            System.out.println(String.join(" - " , date , formattedRate));
         }
     }
 
-    private static BigDecimal convertToRealCourse(int nominal, BigDecimal course) {
+    private static BigDecimal convertToRealCourse(int nominal , BigDecimal course) {
         BigDecimal nominalDivisor = new BigDecimal(nominal);
-        return course.divide(nominalDivisor, 2, RoundingMode.HALF_UP);
+        return course.divide(nominalDivisor , 2 , RoundingMode.HALF_UP);
     }
 
 }

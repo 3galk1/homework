@@ -1,5 +1,7 @@
 package ru.liga.forecaster.service;
 
+import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.liga.forecaster.controller.TelegramBot;
 import ru.liga.forecaster.model.Command;
 import ru.liga.forecaster.model.CurrencyRate;
 import ru.liga.forecaster.model.type.Currency;
@@ -19,20 +21,35 @@ public class Parser {
 
     private static final  DateTimeFormatter formatter = new DateTimeFormatterBuilder().append(ofPattern("dd.MM.yyyy")).toFormatter();
 
+    public static Command parseFromTelegramBot () throws RuntimeException {
+        TelegramBot bot = new TelegramBot();
+        Update update = new Update();
+        bot.onUpdateReceived(update);
+        String message= update.getCallbackQuery().getMessage().getText();
+        String[] parsedCommand = message.split(" ");
+        if (parsedCommand.length==3) {
+            Operation operation = Operation.valueOf(parsedCommand[0].toUpperCase());
+            Currency currency = Currency.valueOf(parsedCommand[1].toUpperCase());
+            Range timeRange = Range.valueOf(parsedCommand[2].toUpperCase());
+            return new Command(operation, currency , timeRange, "", "");
+        }
+        throw new RuntimeException("Некорректная команда");
+    }
+
     public static Command parseFromConsole(String command) throws RuntimeException{
         String[] parsedCommand = command.split(" ");
         if (parsedCommand.length==3) {
             Operation operation = Operation.valueOf(parsedCommand[0].toUpperCase());
             Currency currency = Currency.valueOf(parsedCommand[1].toUpperCase());
             Range timeRange = Range.valueOf(parsedCommand[2].toUpperCase());
-            return new Command(operation, currency , timeRange);
+            return new Command(operation, currency , timeRange, "", "");
         }
         throw new RuntimeException("Некорректная команда");
     }
 
     public static List<CurrencyRate> parseFromCsv(List<String> dataFromCsv, Range rateRange) {
         List<CurrencyRate> rates = new ArrayList<>();
-        for (int i = 0; i < rateRange.getDays(); i++) {
+        for (int i = 0; i < dataFromCsv.size(); i++) {
             String[] parsedData = dataFromCsv.get(i).split(";");
             rates.add(new CurrencyRate(Integer.parseInt(parsedData[0].replace("\"" , "")) ,
                     LocalDate.parse(parsedData[1].replace("\"" , "") , formatter) ,

@@ -9,6 +9,7 @@ import lombok.Getter;
 public enum Range {
     TOMORROW(1),
     WEEK(7),
+    MONTH(31),
     RATE_RANGE(7);
 
     private int days;

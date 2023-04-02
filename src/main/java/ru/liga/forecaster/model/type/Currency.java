@@ -6,9 +6,11 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum Currency {
-    EUR("eur.csv"),
-    TRY("try.csv"),
-    USD("usd.csv");
+    EUR("currency/EUR.csv"),
+    TRY("currency/TRY.csv"),
+    USD("currency/USD.csv"),
+    AMD("currency/AMD.csv"),
+    BGN("currency/BGN.csv");
 
     private String filePath;
 

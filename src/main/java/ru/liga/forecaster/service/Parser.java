@@ -1,53 +1,81 @@
 package ru.liga.forecaster.service;
 
-import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.liga.forecaster.controller.TelegramBot;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import ru.liga.forecaster.model.Command;
 import ru.liga.forecaster.model.CurrencyRate;
-import ru.liga.forecaster.model.type.Currency;
-import ru.liga.forecaster.model.type.Operation;
-import ru.liga.forecaster.model.type.Range;
+import ru.liga.forecaster.model.type.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 
+@AllArgsConstructor
+@Getter
 public class Parser {
+    private static Operation operation;
+    private static Currency currency;
+    private static AlgorithmType algorithm;
+    private static Range timeRange;
+    private static Output output;
 
-    private static final  DateTimeFormatter formatter = new DateTimeFormatterBuilder().append(ofPattern("dd.MM.yyyy")).toFormatter();
+    private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().append(ofPattern("dd.MM.yyyy")).toFormatter();
 
-    public static Command parseFromTelegramBot () throws RuntimeException {
-        TelegramBot bot = new TelegramBot();
-        Update update = new Update();
-        bot.onUpdateReceived(update);
-        String message= update.getCallbackQuery().getMessage().getText();
-        String[] parsedCommand = message.split(" ");
-        if (parsedCommand.length==3) {
-            Operation operation = Operation.valueOf(parsedCommand[0].toUpperCase());
-            Currency currency = Currency.valueOf(parsedCommand[1].toUpperCase());
-            Range timeRange = Range.valueOf(parsedCommand[2].toUpperCase());
-            return new Command(operation, currency , timeRange, "", "");
+    private static final Map<String, String> arguments = new HashMap<>();
+
+    public static Map<String, String> parseNamedArgument(String[] argument) {
+        boolean isParsed=false;
+        for (String s : argument) {
+            String[] namedArg = s.split(" ");
+            switch (namedArg[0]) {
+                case "period":
+                case "alg":
+                case "date":
+                case "output":
+                    if (namedArg[1].isEmpty()) {
+                        throw new RuntimeException("Некорректная команда");
+                    }
+                    arguments.put(namedArg[0] , namedArg[1]);
+                    isParsed = true;
+            }
         }
-        throw new RuntimeException("Некорректная команда");
+        if(!isParsed){
+            throw new RuntimeException("Некорректная команда");
+        }
+        return arguments;
     }
 
-    public static Command parseFromConsole(String command) throws RuntimeException{
-        String[] parsedCommand = command.split(" ");
-        if (parsedCommand.length==3) {
-            Operation operation = Operation.valueOf(parsedCommand[0].toUpperCase());
-            Currency currency = Currency.valueOf(parsedCommand[1].toUpperCase());
-            Range timeRange = Range.valueOf(parsedCommand[2].toUpperCase());
-            return new Command(operation, currency , timeRange, "", "");
+    public static Command parseFromTelegramBot(String message) throws RuntimeException {
+        String[] parsedCommand = message.split("-");
+        LocalDate date = LocalDate.now();
+        try {
+            parseNamedArgument(parsedCommand);
+            String [] command = parsedCommand[0].split(" ");
+            operation = Operation.valueOf(command[0].toUpperCase());
+            currency = Currency.valueOf(command[1].toUpperCase());
+            algorithm = AlgorithmType.valueOf(arguments.get("alg").toUpperCase());
+            if (arguments.containsKey("period")) {
+                timeRange = Range.valueOf(arguments.get("period").toUpperCase());
+                output = Output.valueOf(arguments.get("output").toUpperCase());
+            }
+            if (arguments.containsKey("date")) {
+               date = LocalDate.parse(arguments.get("date") , formatter);
+               timeRange = Range.TOMORROW;
+            }
+            return new Command(operation , currency , timeRange , algorithm , output , date);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Некорректная команда",e);
         }
-        throw new RuntimeException("Некорректная команда");
     }
 
-    public static List<CurrencyRate> parseFromCsv(List<String> dataFromCsv, Range rateRange) {
+    public static List<CurrencyRate> parseFromCsv(List<String> dataFromCsv ) {
         List<CurrencyRate> rates = new ArrayList<>();
         for (int i = 0; i < dataFromCsv.size(); i++) {
             String[] parsedData = dataFromCsv.get(i).split(";");
@@ -58,4 +86,15 @@ public class Parser {
         }
         return rates;
     }
+
+//    public static Command parseFromConsole(String command) throws RuntimeException {
+//        String[] parsedCommand = command.split(" ");
+//        if (parsedCommand.length == 3) {
+//            Operation operation = Operation.valueOf(parsedCommand[0].toUpperCase());
+//            Currency currency = Currency.valueOf(parsedCommand[1].toUpperCase());
+//            Range timeRange = Range.valueOf(parsedCommand[2].toUpperCase());
+//            return new Command(operation , currency , timeRange , null , null , LocalDate.now());
+//        }
+//        throw new RuntimeException("Некорректная команда");
+//    }
 }

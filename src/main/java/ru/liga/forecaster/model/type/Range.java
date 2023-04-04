@@ -1,6 +1,5 @@
 package ru.liga.forecaster.model.type;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,6 +11,6 @@ public enum Range {
     MONTH(31),
     RATE_RANGE(7);
 
-    private int days;
+    private final int days;
 
 }

@@ -1,85 +1,67 @@
 package ru.liga.forecaster.service.algorithm;
 
 
+import ru.liga.forecaster.model.Command;
+import ru.liga.forecaster.model.CurrencyRate;
+import ru.liga.forecaster.model.type.Range;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
-public class LinearRegression {
-    private final double intercept, slope;
-    private final double r2;
-    private final double svar0, svar1;
+public class LinearRegression implements Algorithm{
+    private double intercept, slope;
+    private final double x = 1.0;
 
+    public List<CurrencyRate> extrapolate(List<CurrencyRate> rates , Command command) {
+        List<Double> days = new ArrayList<>();
+        List<Double> course = new ArrayList<>();
+        LocalDate inDate = command.getDate().minusMonths(1);
+        for (int k = 0; k < command.getTimeRange().getDays(); k++) {
+            for (CurrencyRate rate : rates) {
+                if (rate.getDate().isBefore(inDate)) {
+                    break;
+                }
+                days.add((double) rate.getDate().getDayOfMonth());
+                course.add(rate.getCourse().doubleValue() / (double) rate.getNominal());
+            }
+            LinearRegression(days , course);
+            rates.add(0 , new CurrencyRate(
+                    1 ,
+                    (rates.get(0).getDate().isBefore(LocalDate.now()) ? LocalDate.now() : rates.get(0).getDate()).plusDays(1) ,
+                    BigDecimal.valueOf(predict(x)) ,
+                    rates.get(0).getCurrency()));
+        }
+        return rates;
+    }
 
-    public LinearRegression(List<Double> x , List<Double> y) {
+    public void LinearRegression(List<Double> x , List<Double> y) {
         if (x.size() != y.size()) {
             throw new IllegalArgumentException("array lengths are not equal");
         }
         int n = x.size();
 
-        // first pass
-        double sumx = 0.0, sumy = 0.0, sumx2 = 0.0;
+        double sumx = 0.0, sumy = 0.0;
         for (int i = 0; i < n; i++) {
             sumx += x.get(i);
-            sumx2 += x.get(i) * x.get(i);
             sumy += y.get(i);
         }
         double xbar = sumx / n;
         double ybar = sumy / n;
 
-        // second pass: compute summary statistics
-        double xxbar = 0.0, yybar = 0.0, xybar = 0.0;
+        double xxbar = 0.0, xybar = 0.0;
         for (int i = 0; i < n; i++) {
             xxbar += (x.get(i) - xbar) * (x.get(i) - xbar);
-            yybar += (y.get(i) - ybar) * (y.get(i) - ybar);
             xybar += (x.get(i) - xbar) * (y.get(i) - ybar);
         }
         slope = xybar / xxbar;
         intercept = ybar - slope * xbar;
-
-        // more statistical analysis
-        double rss = 0.0;      // residual sum of squares
-        double ssr = 0.0;      // regression sum of squares
-        for (int i = 0; i < n; i++) {
-            double fit = slope * x.get(i) + intercept;
-            rss += (fit - y.get(i)) * (fit - y.get(i));
-            ssr += (fit - ybar) * (fit - ybar);
-        }
-
-        int degreesOfFreedom = n - 2;
-        r2 = ssr / yybar;
-        double svar = rss / degreesOfFreedom;
-        svar1 = svar / xxbar;
-        svar0 = svar / n + xbar * xbar * svar1;
-    }
-
-    public double intercept() {
-        return intercept;
-    }
-
-    public double slope() {
-        return slope;
-    }
-
-    public double R2() {
-        return r2;
-    }
-
-    public double interceptStdErr() {
-        return Math.sqrt(svar0);
-    }
-
-    public double slopeStdErr() {
-        return Math.sqrt(svar1);
     }
 
     public double predict(double x) {
         return slope * x + intercept;
     }
 
-    public String toString() {
-        StringBuilder s = new StringBuilder();
-        s.append(String.format("%.2f n + %.2f" , slope() , intercept()));
-        s.append("  (R^2 = " + String.format("%.3f" , R2()) + ")");
-        return s.toString();
-    }
 
 }

@@ -12,7 +12,7 @@ public enum Currency {
     AMD("currency/AMD.csv"),
     BGN("currency/BGN.csv");
 
-    private String filePath;
+    private final String filePath;
 
 
 }

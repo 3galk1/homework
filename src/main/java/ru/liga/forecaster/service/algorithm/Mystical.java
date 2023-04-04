@@ -8,12 +8,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Mystical {
+public class Mystical implements Algorithm{
 
-    public List<CurrencyRate> calculateMysticalRate(List<CurrencyRate> rates , Command command) {
+    public List<CurrencyRate> extrapolate(List<CurrencyRate> rates , Command command) {
         for (int k = 0; k < command.getTimeRange().getDays(); k++) {
             List<CurrencyRate> mysticalRates = new ArrayList<>();
-            LocalDate inDate = LocalDate.now().plusDays(k); //Дата с command
+            LocalDate inDate = command.getDate().plusDays(k); //Дата с command
             for (CurrencyRate currentRate : rates) {
                 boolean isFound = false;
                 LocalDate actualDate = inDate;
@@ -21,7 +21,7 @@ public class Mystical {
                     if (currentRate.getDate().equals(actualDate=actualDate.minusYears(1))) {
                         mysticalRates.add(currentRate);
                         isFound = true;
-                    } else if (actualDate.isBefore(LocalDate.of(2005 , 01 , 01))) {
+                    } else if (actualDate.isBefore(LocalDate.of(2005 ,01 ,01))) {
                         break;
                     }
                 }

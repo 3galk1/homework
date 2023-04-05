@@ -10,9 +10,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RatePrint {
+public class ListUtils {
     public static String ratePrint(List<CurrencyRate> data , Command command) {
-            String printCourse="";
+        String printCourse="";
         for (int i = command.getTimeRange().getDays() - 1; i >= 0; i--) {
             CurrencyRate rate = data.get(i);
             BigDecimal normalizedRate = convertToRealCourse(rate.getNominal() , rate.getCourse());

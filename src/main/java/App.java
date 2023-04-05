@@ -9,9 +9,8 @@ import java.io.IOException;
 
 public class App {
 
-    public static void main(String[] args) throws IOException, TelegramApiException {
+    public static void main(String[] args) throws TelegramApiException {
         TelegramBotsApi telegramBot = new TelegramBotsApi(DefaultBotSession.class);
         telegramBot.registerBot(new TelegramBot());
-        CurrencyRateApp.StartForecaster(new Update());
     }
 }

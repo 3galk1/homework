@@ -16,16 +16,14 @@ public class LastYear implements Algorithm{
             boolean isFound = false;
             for (CurrencyRate currentRate : rates) {
                 LocalDate actualDate = inDate;
-                int days = 0;
-                while (!isFound) {
-                    if (currentRate.getDate().equals(actualDate = actualDate.minusDays(days))) {
+                for (int i = 0; i < Range.WEEK.getDays(); i++) {
+                    if (currentRate.getDate().equals(actualDate = actualDate.minusDays(i))) {
                         rates.add(0 , new CurrencyRate(
                                 currentRate.getNominal() ,
                                 (rates.get(0).getDate().isBefore(LocalDate.now()) ? LocalDate.now() : rates.get(0).getDate()).plusDays(1) ,
                                 currentRate.getCourse() ,
                                 currentRate.getCurrency()));
                         isFound = true;
-                        days++;
                         break;
                     }
                 }

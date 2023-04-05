@@ -66,8 +66,8 @@ public class Parser {
                 output = Output.valueOf(arguments.get("output").toUpperCase());
             }
             if (arguments.containsKey("date")) {
-               date = LocalDate.parse(arguments.get("date") , formatter);
-               timeRange = Range.TOMORROW;
+                date = LocalDate.parse(arguments.get("date") , formatter);
+                timeRange = Range.TOMORROW;
             }
             return new Command(operation , currency , timeRange , algorithm , output , date);
         } catch (RuntimeException e) {

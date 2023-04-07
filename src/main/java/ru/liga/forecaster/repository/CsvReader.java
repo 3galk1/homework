@@ -1,4 +1,4 @@
-package ru.liga.forecaster.util.reader;
+package ru.liga.forecaster.repository;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

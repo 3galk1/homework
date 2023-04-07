@@ -10,14 +10,8 @@ import java.time.LocalDate;
 @Getter
 public class CurrencyRate {
     private final int nominal;
-    private final String currency;
     private final LocalDate date;
     private final BigDecimal course;
+    private final String currency;
 
-    public CurrencyRate(int nominal, LocalDate date, BigDecimal course, String currency) {
-        this.nominal = nominal;
-        this.date = date;
-        this.course = course;
-        this.currency = currency;
-    }
 }

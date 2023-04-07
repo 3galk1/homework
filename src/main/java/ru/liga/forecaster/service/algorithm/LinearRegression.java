@@ -29,7 +29,7 @@ public class LinearRegression implements Algorithm {
             rates.add(0, new CurrencyRate(
                     1,
                     (rates.get(0).getDate().isBefore(LocalDate.now()) ? LocalDate.now() : rates.get(0).getDate()).plusDays(1),
-                    BigDecimal.valueOf(predict(x+k)),
+                    BigDecimal.valueOf(predict(x + k)),
                     rates.get(0).getCurrency()));
         }
         return rates;

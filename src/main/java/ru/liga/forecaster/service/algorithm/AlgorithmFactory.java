@@ -15,8 +15,9 @@ public class AlgorithmFactory {
             case LINEAR:
                 return new LinearRegression();
             case MYST:
-                return  new Mystical();
-            default: throw new RuntimeException("Алгоритм не найден");
+                return new Mystical();
+            default:
+                throw new RuntimeException("Алгоритм не найден");
         }
     }
 }

@@ -9,20 +9,17 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.liga.forecaster.model.Command;
-import ru.liga.forecaster.model.CurrencyRate;
 import ru.liga.forecaster.model.type.Output;
-import ru.liga.forecaster.service.CurrencyRateApp;
+import ru.liga.forecaster.service.ForecasterApp;
 import ru.liga.forecaster.service.Parser;
 import ru.liga.forecaster.util.CreateCourseGraph;
 import ru.liga.forecaster.util.CreateCourseList;
 
 import java.io.File;
-import java.util.List;
+import java.util.Map;
 
 @Data
 public class TelegramBot extends TelegramLongPollingBot {
-    private Command command;
 
     @SneakyThrows
     @Override
@@ -30,39 +27,45 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String originalMessage = update.getMessage().getText();
             String chatId = update.getMessage().getChatId().toString();
+            handlingUserMessage(originalMessage , chatId);
+        }
+    }
 
-
-            if (originalMessage.equals("/Start")) {
-                sendAnswerMessage(chatId, "Привет ^_^" + "\n" + "Введитe команду:");
-            } else {
-                try {
-                    command = Parser.parseFromTelegramBot(originalMessage);
-                    List<CurrencyRate> rates = new CurrencyRateApp().StartForecaster(originalMessage);
-                    if (command.getOutput().equals(Output.GRAPH)) {
-                        sendImage(chatId, new CreateCourseGraph().createRateGraph(rates, command));
-                    } else {
-                        sendAnswerMessage(chatId, new CreateCourseList().createCourseForSend(rates, command));
-                    }
-                } catch (RuntimeException e) {
-                    sendAnswerMessage(chatId, e.getMessage() + originalMessage);
+    private void handlingUserMessage(String originalMessage , String chatId) throws TelegramApiException {
+        if (originalMessage.equals("/Start")) {
+            sendText(chatId , "Привет ^_^" + "\n" + "Введитe команду:");
+        } else {
+            try {
+                Map<String, String> arguments = Parser.ParseMessage(originalMessage);
+                String currency = arguments.get("currency");
+                if (arguments.get("output").equals(Output.GRAPH.name())) {
+                    sendImage(chatId , new CreateCourseGraph()
+                            .CreateRatesGraph(ForecasterApp.StartForecaster(arguments) , currency));
+                } else {
+                    sendText(chatId , new CreateCourseList()
+                            .CreateCourseList(ForecasterApp.StartForecaster(arguments) , arguments));
                 }
+            } catch (RuntimeException e) {
+                sendText(chatId , e.getMessage() + originalMessage);
+            } catch (Exception e) {
+
             }
         }
     }
 
-    private void sendAnswerMessage(String chatId, String text) throws TelegramApiException {
-        SendMessage answer = new SendMessage();
-        answer.setText(text);
-        answer.setChatId(chatId);
-        this.execute(answer);
+    private void sendText(String chatId , String text) throws TelegramApiException {
+        SendMessage sendText = new SendMessage();
+        sendText.setText(text);
+        sendText.setChatId(chatId);
+        this.execute(sendText);
     }
 
-    private void sendImage(String chatId, File file) {
+    private void sendImage(String chatId , File file) throws TelegramApiException {
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
         sendPhoto.setPhoto(new InputFile(file));
+        this.execute(sendPhoto);
     }
-
 
     @Override
     public String getBotUsername() {

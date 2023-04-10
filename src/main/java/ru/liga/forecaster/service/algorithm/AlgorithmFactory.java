@@ -6,13 +6,13 @@ import ru.liga.forecaster.model.type.AlgorithmType;
 @AllArgsConstructor
 public class AlgorithmFactory {
 
-    public Algorithm createAlgorithm(AlgorithmType type) {
+    public ForecastAlgorithm createAlgorithm(AlgorithmType type) {
         switch (type) {
-            case EXTRA:
-                return new Extrapolate();
+            case AVG:
+                return new Average();
             case LAST:
                 return new LastYear();
-            case LINEAR:
+            case LINE:
                 return new LinearRegression();
             case MYST:
                 return new Mystical();

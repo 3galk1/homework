@@ -5,6 +5,6 @@ import ru.liga.forecaster.model.CurrencyRate;
 
 import java.util.List;
 
-public interface Algorithm {
-    List<CurrencyRate> extrapolate(List<CurrencyRate> rates, Command command);
+public interface ForecastAlgorithm {
+    List<CurrencyRate> ExtrapolatedOnTimeRange(List<CurrencyRate> rates, Command command);
 }

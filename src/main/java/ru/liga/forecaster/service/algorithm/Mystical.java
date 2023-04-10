@@ -7,35 +7,47 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Mystical implements Algorithm {
+public class Mystical implements ForecastAlgorithm {
+    private final List<CurrencyRate> mysticalRates = new ArrayList<>();
+    private final LocalDate endDate = LocalDate.of(2005 , 01 , 01);
 
-    public List<CurrencyRate> extrapolate(List<CurrencyRate> rates, Command command) {
-        for (int k = 0; k < command.getTimeRange().getDays(); k++) {
-            List<CurrencyRate> mysticalRates = new ArrayList<>();
-            LocalDate inDate = command.getDate().plusDays(k); //Дата с command
-            for (CurrencyRate currentRate : rates) {
-                boolean isFound = false;
-                LocalDate actualDate = inDate;
-                while (!isFound) {
-                    if (currentRate.getDate().equals(actualDate = actualDate.minusYears(1))) {
-                        mysticalRates.add(currentRate);
-                        isFound = true;
-                    } else if (actualDate.isBefore(LocalDate.of(2005, 01, 01))) {
-                        break;
-                    }
+    public void ExtrapolatedOnTomorrow(List<CurrencyRate> rates , LocalDate startDate , boolean isFound) {
+        for (CurrencyRate currentRate : rates) {
+            LocalDate actualDate = startDate;
+            while (!isFound) {
+                if (currentRate.getDate().equals(actualDate = actualDate.minusYears(1))) {
+                    mysticalRates.add(currentRate);
+                    isFound = true;
+                } else if (actualDate.isBefore(endDate)) {
+                    break;
                 }
             }
+        }
+    }
+
+    public List<CurrencyRate> ExtrapolatedOnTimeRange(List<CurrencyRate> rates , Command command) {
+        for (int k = 0; k < command.getTimeRange().getDays(); k++) {
+            ExtrapolatedOnTomorrow(rates , command.getDate().plusDays(k) , false);
             if (mysticalRates.isEmpty()) {
                 throw new RuntimeException("Ошибка данных, отсутсвуют записи для расчета");
             }
-            double index = Math.random() * mysticalRates.size(); //рандомный элемент из массива
-            rates.add(0, new CurrencyRate(
-                    mysticalRates.get((int) index).getNominal(),
-                    (rates.get(0).getDate().isBefore(LocalDate.now()) ? LocalDate.now() : rates.get(0).getDate()).plusDays(1),
-                    mysticalRates.get((int) index).getCourse(),
-                    mysticalRates.get((int) index).getCurrency()));
-
+            double index = Math.random() * mysticalRates.size();
+            WriteExtrapolatedRate(rates , mysticalRates , (int) index);
         }
         return rates;
+    }
+
+    private void WriteExtrapolatedRate(List<CurrencyRate> rates , List<CurrencyRate> mysticalRates , int index) {
+        rates.add(0 , new CurrencyRate(
+                mysticalRates.get(index).getNominal() ,
+                CheckDate(rates) ,
+                mysticalRates.get(index).getCourse() ,
+                mysticalRates.get(index).getCurrency()));
+    }
+
+    private LocalDate CheckDate(List<CurrencyRate> rates) {
+        int firstRate = 0;
+        return (rates.get(firstRate).getDate().isBefore(LocalDate.now()) ? LocalDate.now() :
+                rates.get(firstRate).getDate()).plusDays(1);
     }
 }

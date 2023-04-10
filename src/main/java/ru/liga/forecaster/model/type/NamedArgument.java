@@ -5,7 +5,9 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum Operation {
-    RATE("RATE");
-    String name;
+public enum NamedArgument {
+    PERIOD,
+    OUTPUT,
+    ALG,
+    DATE
 }

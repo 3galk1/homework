@@ -7,8 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum AlgorithmType {
     MYST("Mystical"),
-    EXTRA("Extrapolate"),
-    LINEAR("LinearRegression"),
+    AVG("Average"),
+    LINE("LinearRegression"),
     LAST("LastYear");
 
     private final String type;

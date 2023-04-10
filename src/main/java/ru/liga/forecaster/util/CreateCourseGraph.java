@@ -1,19 +1,21 @@
 package ru.liga.forecaster.util;
 
-import lombok.SneakyThrows;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
-import ru.liga.forecaster.model.Command;
 import ru.liga.forecaster.model.CurrencyRate;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CreateCourseGraph {
@@ -34,11 +36,11 @@ public class CreateCourseGraph {
      * @param dataset the dataset.
      * @return The chart.
      */
-    private static JFreeChart createChart(CategoryDataset dataset) {
+    private static JFreeChart CreateChart(CategoryDataset dataset) {
         JFreeChart chart = ChartFactory.createLineChart(
-                null,
-                "Next days" /* x-axis label*/,
-                "RUB" /* y-axis label */,
+                null ,
+                "date" /* x-axis label*/ ,
+                "course" /* y-axis label */ ,
                 dataset);
         chart.setBackgroundPaint(Color.WHITE);
         CategoryPlot plot = (CategoryPlot) chart.getPlot();
@@ -51,39 +53,36 @@ public class CreateCourseGraph {
     /**
      * Returns a sample dataset.
      */
-    private void setData(List<List<CurrencyRate>> rateList, List<String> currencyList) {
+    private void SetData(List<List<CurrencyRate>> rateList , List<String> currencyList) {
         dataset.clear();
         for (int j = 0; j < currencyList.size(); j++) {
             List<CurrencyRate> tempRate = rateList.get(j);
-            for (int i = 0; i < tempRate.size(); i++) {
-                CurrencyRate cur = tempRate.get(i);
-                dataset.addValue(cur.getCourse(), currencyList.get(j), cur.getDate());
+            for (CurrencyRate cur : tempRate) {
+                dataset.addValue(
+                        convertToRealCourse(cur.getNominal(),cur.getCourse()) ,
+                        currencyList.get(j) ,
+                        cur.getDate());
             }
         }
     }
-
-    @SneakyThrows
-    private File getCurrencyRatesAsGraph() {
-        JFreeChart chart = createChart(dataset);
+    private BigDecimal convertToRealCourse(int nominal , BigDecimal course) {
+        BigDecimal nominalDivisor = new BigDecimal(nominal);
+        return course.divide(nominalDivisor , 4 , RoundingMode.HALF_UP);
+    }
+    private File GetCurrencyRatesAsGraph() throws IOException {
+        JFreeChart chart = CreateChart(dataset);
         CategoryPlot plot = (CategoryPlot) chart.getPlot();
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         rangeAxis.setAutoRangeIncludesZero(false);
-
         File lineChart = new File("lineChart.png");
-        ImageIO.write(chart.createBufferedImage(1000, 400), "png", lineChart);
+        ImageIO.write(chart.createBufferedImage(1000 , 400) , "png" , lineChart);
         return lineChart;
     }
 
-    public File createRateGraph(List<CurrencyRate> rates, Command command) {
-        List<List<CurrencyRate>> extrapolated = new ArrayList<>();
-        List<String> currency = new ArrayList<>();
-        List<CurrencyRate> rate = new ArrayList<>();
-        for (int i = 0; i < command.getTimeRange().getDays(); i++) {
-            rate.add(rates.get(i));
-            currency.add(rates.get(i).getCurrency());
-        }
-        extrapolated.add(rate);
-        setData(extrapolated, currency);
-        return getCurrencyRatesAsGraph();
+    public File CreateRatesGraph(List<List<CurrencyRate>> rates , String cur) throws IOException {
+        String[] args = cur.split(",");
+        List<String> currency = new ArrayList<>(Arrays.asList(args));
+        SetData(rates , currency);
+        return GetCurrencyRatesAsGraph();
     }
 }

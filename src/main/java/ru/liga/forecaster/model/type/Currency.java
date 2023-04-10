@@ -13,6 +13,4 @@ public enum Currency {
     BGN("currency/BGN.csv");
 
     private final String filePath;
-
-
 }

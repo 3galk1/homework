@@ -1,6 +1,5 @@
 package ru.liga.forecaster.service.algorithm;
 
-
 import ru.liga.forecaster.model.Command;
 import ru.liga.forecaster.model.CurrencyRate;
 
@@ -9,33 +8,42 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LinearRegression implements Algorithm {
+public class LinearRegression implements ForecastAlgorithm {
     private double intercept, slope;
-    private final double x = 31.0;
+    private final int firstRate = 0;
+    private final List<Double> days = new ArrayList<>();
+    private final List<Double> course = new ArrayList<>();
 
-    public List<CurrencyRate> extrapolate(List<CurrencyRate> rates, Command command) {
-        List<Double> days = new ArrayList<>();
-        List<Double> course = new ArrayList<>();
-        LocalDate inDate = command.getDate().minusMonths(1);
+    private void ExtrapolatedOnTomorrow(List<CurrencyRate> rates , Command command) {
+        LocalDate endDate = command.getDate().minusMonths(1);
         for (CurrencyRate rate : rates) {
-            if (rate.getDate().isBefore(inDate)) {
+            if (rate.getDate().isBefore(endDate)) {
                 break;
             }
             days.add((double) rate.getDate().getDayOfMonth());
             course.add(rate.getCourse().doubleValue() / (double) rate.getNominal());
         }
+    }
+
+    public List<CurrencyRate> ExtrapolatedOnTimeRange(List<CurrencyRate> rates , Command command) {
+        ExtrapolatedOnTomorrow(rates , command);
         for (int k = 1; k <= command.getTimeRange().getDays(); k++) {
-            calcLinearRegression(days, course);
-            rates.add(0, new CurrencyRate(
-                    1,
-                    (rates.get(0).getDate().isBefore(LocalDate.now()) ? LocalDate.now() : rates.get(0).getDate()).plusDays(1),
-                    BigDecimal.valueOf(predict(x + k)),
-                    rates.get(0).getCurrency()));
+            calcLinearRegression(days , course);
+            WriteExtrapolatedRate(rates , k);
         }
         return rates;
     }
 
-    public void calcLinearRegression(List<Double> x, List<Double> y) {
+    private void WriteExtrapolatedRate(List<CurrencyRate> rates , int k) {
+        double x = 31.0;
+        rates.add(firstRate , new CurrencyRate(
+                1 ,
+                CheckDate(rates) ,
+                BigDecimal.valueOf(predict(x + k)) ,
+                rates.get(firstRate).getCurrency()));
+    }
+
+    private void calcLinearRegression(List<Double> x , List<Double> y) {
         if (x.size() != y.size()) {
             throw new IllegalArgumentException("array lengths are not equal");
         }
@@ -58,9 +66,13 @@ public class LinearRegression implements Algorithm {
         intercept = ybar - slope * xbar;
     }
 
-    public double predict(double x) {
+    private double predict(double x) {
         return slope * x + intercept;
     }
 
+    private LocalDate CheckDate(List<CurrencyRate> rates) {
+        return (rates.get(firstRate).getDate().isBefore(LocalDate.now()) ? LocalDate.now() :
+                rates.get(firstRate).getDate()).plusDays(1);
+    }
 
 }

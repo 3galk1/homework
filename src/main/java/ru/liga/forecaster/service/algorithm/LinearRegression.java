@@ -10,14 +10,37 @@ import java.util.List;
 
 public class LinearRegression implements ForecastAlgorithm {
     private double intercept, slope;
-    private final int firstRate = 0;
+    private final static int FIRST_RATE = 0;
     private final List<Double> days = new ArrayList<>();
     private final List<Double> course = new ArrayList<>();
 
-    private void ExtrapolatedOnTomorrow(List<CurrencyRate> rates , Command command) {
-        LocalDate endDate = command.getDate().minusMonths(1);
+    public List<CurrencyRate> extrapolatedOnTimeRange(List<CurrencyRate> rates , Command command) {
+        extrapolatedOnTomorrow(rates , command);
+        for (int k = 1; k <= command.getTimeRange().getDays(); k++) {
+            calcLinearRegression(days , course);
+            WriteExtrapolatedRate(rates , k);
+        }
+        if (!command.getDate().equals(LocalDate.now())) {
+            extrapolatedOnDate(rates , command);
+        }
+        return rates;
+    }
+
+    private void extrapolatedOnDate(List<CurrencyRate> rates , Command command) {
+        LocalDate endDate = command.getDate();
+        LocalDate currentDate = LocalDate.now();
+        int count = 0;
+        while (currentDate.isBefore(endDate)) {
+            currentDate=currentDate.plusDays(count);
+            count++;
+        }
+        WriteExtrapolatedRate(rates , count);
+    }
+
+    private void extrapolatedOnTomorrow(List<CurrencyRate> rates , Command command) {
+        LocalDate startDate = LocalDate.now().minusMonths(1);
         for (CurrencyRate rate : rates) {
-            if (rate.getDate().isBefore(endDate)) {
+            if (rate.getDate().isBefore(startDate)) {
                 break;
             }
             days.add((double) rate.getDate().getDayOfMonth());
@@ -25,22 +48,13 @@ public class LinearRegression implements ForecastAlgorithm {
         }
     }
 
-    public List<CurrencyRate> ExtrapolatedOnTimeRange(List<CurrencyRate> rates , Command command) {
-        ExtrapolatedOnTomorrow(rates , command);
-        for (int k = 1; k <= command.getTimeRange().getDays(); k++) {
-            calcLinearRegression(days , course);
-            WriteExtrapolatedRate(rates , k);
-        }
-        return rates;
-    }
-
     private void WriteExtrapolatedRate(List<CurrencyRate> rates , int k) {
         double x = 31.0;
-        rates.add(firstRate , new CurrencyRate(
+        rates.add(FIRST_RATE , new CurrencyRate(
                 1 ,
                 CheckDate(rates) ,
                 BigDecimal.valueOf(predict(x + k)) ,
-                rates.get(firstRate).getCurrency()));
+                rates.get(FIRST_RATE).getCurrency()));
     }
 
     private void calcLinearRegression(List<Double> x , List<Double> y) {
@@ -71,8 +85,8 @@ public class LinearRegression implements ForecastAlgorithm {
     }
 
     private LocalDate CheckDate(List<CurrencyRate> rates) {
-        return (rates.get(firstRate).getDate().isBefore(LocalDate.now()) ? LocalDate.now() :
-                rates.get(firstRate).getDate()).plusDays(1);
+        return (rates.get(FIRST_RATE).getDate().isBefore(LocalDate.now()) ? LocalDate.now() :
+                rates.get(FIRST_RATE).getDate()).plusDays(1);
     }
 
 }

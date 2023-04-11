@@ -2,53 +2,82 @@ package ru.liga.forecaster.controller;
 
 
 import lombok.Data;
-import lombok.SneakyThrows;
+import lombok.EqualsAndHashCode;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.liga.forecaster.exception.DataErrorException;
+import ru.liga.forecaster.exception.IncorrectCommandException;
+import ru.liga.forecaster.mapper.CommandMapper;
+import ru.liga.forecaster.model.Command;
 import ru.liga.forecaster.model.type.Output;
 import ru.liga.forecaster.service.ForecasterApp;
-import ru.liga.forecaster.service.Parser;
+import ru.liga.forecaster.service.parser.Parser;
 import ru.liga.forecaster.util.CreateCourseGraph;
 import ru.liga.forecaster.util.CreateCourseList;
+import ru.liga.forecaster.util.TelegramConstants;
 
 import java.io.File;
 import java.util.Map;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
 public class TelegramBot extends TelegramLongPollingBot {
+    private final CreateCourseList createCourseList;
+    private final CreateCourseGraph createCourseGraph;
+    private final ForecasterApp forecasterApp;
+    private Command command;
+    private final CommandMapper commandMapper;
+    private final TelegramConstants telegramConstants;
+    private static final String CURRENCY = "currency", OUTPUT = "output", ERROR = "error";
 
-    @SneakyThrows
+    @Override
+    public String getBotUsername() {
+        return telegramConstants.getBot_name();
+    }
+
+    @Override
+    public String getBotToken() {
+        return telegramConstants.getBot_token();
+    }
+
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String originalMessage = update.getMessage().getText();
             String chatId = update.getMessage().getChatId().toString();
-            handlingUserMessage(originalMessage , chatId);
+            try {
+                handlingUserMessage(originalMessage , chatId);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     private void handlingUserMessage(String originalMessage , String chatId) throws TelegramApiException {
         if (originalMessage.equals("/Start")) {
-            sendText(chatId , "Привет ^_^" + "\n" + "Введитe команду:");
+            sendText(chatId , "Введитe команду:");
         } else {
             try {
-                Map<String, String> arguments = Parser.ParseMessage(originalMessage);
-                String currency = arguments.get("currency");
-                if (arguments.get("output").equals(Output.GRAPH.name())) {
-                    sendImage(chatId , new CreateCourseGraph()
-                            .CreateRatesGraph(ForecasterApp.StartForecaster(arguments) , currency));
+                Map<String, String> parseArguments = Parser.parseArguments(originalMessage);
+                if (parseArguments.containsKey(ERROR)) {
+                    sendText(chatId , parseArguments.get(ERROR));
                 } else {
-                    sendText(chatId , new CreateCourseList()
-                            .CreateCourseList(ForecasterApp.StartForecaster(arguments) , arguments));
+                    command = commandMapper.MapCommand(parseArguments);
+                    if (command.getOutput().equals(Output.GRAPH)) {
+                        sendImage(chatId , createCourseGraph.createRatesGraph(
+                                forecasterApp.StartForecaster(command) , command.getCurrency()));
+                    } else {
+                        sendText(chatId , createCourseList.createCurrencyCourseList(
+                                forecasterApp.StartForecaster(command) , command));
+                    }
                 }
-            } catch (RuntimeException e) {
-                sendText(chatId , e.getMessage() + originalMessage);
-            } catch (Exception e) {
-
+            } catch (DataErrorException e) {
+                sendText(chatId , e.getMessage() + " " + originalMessage);
+            } catch (Exception ignored) {
             }
         }
     }
@@ -65,16 +94,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         sendPhoto.setChatId(chatId);
         sendPhoto.setPhoto(new InputFile(file));
         this.execute(sendPhoto);
-    }
-
-    @Override
-    public String getBotUsername() {
-        return "CourseForecasterBot";
-    }
-
-    @Override
-    public String getBotToken() {
-        return "6223395355:AAE45DGF-3Imez1mAv5jZGoUoW1T3s7grVs";
     }
 
 }

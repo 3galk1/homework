@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @AllArgsConstructor
-
 @Getter
 public class CurrencyRate {
     private final int nominal;

@@ -5,13 +5,14 @@ import lombok.Getter;
 import ru.liga.forecaster.model.type.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @AllArgsConstructor
 @Getter
 public class Command {
-    private final Range timeRange;
     private final Operation operation;
-    private final Currency currency;
+    private final List<Currency> currency;
+    private final Range timeRange;
     private final AlgorithmType algorithm;
     private final Output output;
     private final LocalDate date;

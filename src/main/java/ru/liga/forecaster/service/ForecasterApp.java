@@ -1,26 +1,31 @@
 package ru.liga.forecaster.service;
 
+import lombok.Data;
+import ru.liga.forecaster.exception.DataErrorException;
+import ru.liga.forecaster.mapper.CommandMapper;
 import ru.liga.forecaster.model.Command;
 import ru.liga.forecaster.model.CurrencyRate;
+import ru.liga.forecaster.model.type.Currency;
 import ru.liga.forecaster.repository.CsvReader;
 import ru.liga.forecaster.service.algorithm.AlgorithmFactory;
-import ru.liga.forecaster.util.CreateCommand;
+import ru.liga.forecaster.service.parser.CsvParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+@Data
 public class ForecasterApp {
+    private ForecastService forecastService = new ForecastService();
+    private AlgorithmFactory algorithmFactory = new AlgorithmFactory();
+    private static String CURRENCY;
 
-    public static List<List<CurrencyRate>> StartForecaster(Map<String, String> arguments) throws IOException {
-        String[] curCount = arguments.get("currency").split(",");
+    public List<List<CurrencyRate>> StartForecaster(Command command) throws IOException, DataErrorException {
         List<List<CurrencyRate>> extrapolated = new ArrayList<>();
-        for (String cur : curCount) {
-            arguments.replace("currency" , cur);
-            Command command = new CreateCommand().CreateCommand(arguments);
-            List<CurrencyRate> rates = Parser.ParseFromCsv(CsvReader.readCsv(command.getCurrency().getFilePath()));
-            extrapolated.add(new Forecaster(new AlgorithmFactory()).ForecastRate(rates , command));
+        for (Currency cur : command.getCurrency()) {
+            List<CurrencyRate> rates = CsvParser.ParseFromCsv(CsvReader.readCsv(cur.getFilePath()));
+            extrapolated.add(algorithmFactory.createAlgorithm(command.getAlgorithm())
+                    .extrapolatedOnTimeRange(rates , command));
         }
         return extrapolated;
     }

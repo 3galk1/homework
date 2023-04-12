@@ -1,6 +1,7 @@
 package ru.liga.forecaster.service.parser;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import ru.liga.forecaster.model.type.Currency;
 import ru.liga.forecaster.model.type.NamedArgument;
 import ru.liga.forecaster.service.Validation;
@@ -8,6 +9,7 @@ import ru.liga.forecaster.service.Validation;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Data
 public class Parser {
     private static Map<String, String> parsedArguments = new HashMap<>();
@@ -17,9 +19,11 @@ public class Parser {
     public static Map<String, String> parseArguments(String originalMessage) {
 
         if (Validation.argumentsValidation(originalMessage).isEmpty()) {
+            log.info("Старт парсинга");
             parseCurrency(originalMessage);
             parseRate(originalMessage);
             parseNamedArguments(originalMessage);
+            log.info("Завершение парсинга");
             return parsedArguments;
         }
         parsedArguments.put(ERROR , Validation.errorMessage);

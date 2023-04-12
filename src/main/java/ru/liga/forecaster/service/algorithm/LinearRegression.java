@@ -10,7 +10,7 @@ import java.util.List;
 
 public class LinearRegression implements ForecastAlgorithm {
     private double intercept, slope;
-    private final static int FIRST_RATE = 0;
+    private static final int FIRST_RATE = 0;
     private final List<Double> days = new ArrayList<>();
     private final List<Double> course = new ArrayList<>();
 
@@ -18,7 +18,7 @@ public class LinearRegression implements ForecastAlgorithm {
         extrapolatedOnTomorrow(rates , command);
         for (int k = 1; k <= command.getTimeRange().getDays(); k++) {
             calcLinearRegression(days , course);
-            WriteExtrapolatedRate(rates , k);
+            writeExtrapolatedRate(rates , k);
         }
         if (!command.getDate().equals(LocalDate.now())) {
             extrapolatedOnDate(rates , command);
@@ -31,10 +31,10 @@ public class LinearRegression implements ForecastAlgorithm {
         LocalDate currentDate = LocalDate.now();
         int count = 0;
         while (currentDate.isBefore(endDate)) {
-            currentDate=currentDate.plusDays(count);
+            currentDate = currentDate.plusDays(count);
             count++;
         }
-        WriteExtrapolatedRate(rates , count);
+        writeExtrapolatedRate(rates , count);
     }
 
     private void extrapolatedOnTomorrow(List<CurrencyRate> rates , Command command) {
@@ -48,13 +48,14 @@ public class LinearRegression implements ForecastAlgorithm {
         }
     }
 
-    private void WriteExtrapolatedRate(List<CurrencyRate> rates , int k) {
+    private void writeExtrapolatedRate(List<CurrencyRate> rates , int k) {
         double x = 31.0;
-        rates.add(FIRST_RATE , new CurrencyRate(
-                1 ,
-                CheckDate(rates) ,
-                BigDecimal.valueOf(predict(x + k)) ,
-                rates.get(FIRST_RATE).getCurrency()));
+        rates.add(FIRST_RATE , new CurrencyRate.CurrencyRateBuilder()
+                .nominal(1)
+                .date(CheckDate(rates))
+                .course(BigDecimal.valueOf(predict(x + k)))
+                .currency(rates.get(FIRST_RATE).getCurrency())
+                .build());
     }
 
     private void calcLinearRegression(List<Double> x , List<Double> y) {

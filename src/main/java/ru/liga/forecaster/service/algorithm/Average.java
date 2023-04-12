@@ -26,9 +26,9 @@ public class Average implements ForecastAlgorithm {
 
     private void extrapolatedOnDate(List<CurrencyRate> rates , Command command) {
         LocalDate endDate = command.getDate();
-        LocalDate currentDate=LocalDate.now();
-        while (currentDate.isBefore(endDate)){
-            extrapolatedOnTomorrow(rates,command);
+        LocalDate currentDate = LocalDate.now();
+        while (currentDate.isBefore(endDate)) {
+            extrapolatedOnTomorrow(rates , command);
             currentDate = rates.get(FIRST_RATE).getDate();
         }
     }

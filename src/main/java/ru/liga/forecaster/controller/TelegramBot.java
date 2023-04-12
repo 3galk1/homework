@@ -3,6 +3,7 @@ package ru.liga.forecaster.controller;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -10,7 +11,6 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.liga.forecaster.exception.DataErrorException;
-import ru.liga.forecaster.exception.IncorrectCommandException;
 import ru.liga.forecaster.mapper.CommandMapper;
 import ru.liga.forecaster.model.Command;
 import ru.liga.forecaster.model.type.Output;
@@ -23,7 +23,8 @@ import ru.liga.forecaster.util.TelegramConstants;
 import java.io.File;
 import java.util.Map;
 
-@EqualsAndHashCode(callSuper = false)
+@Slf4j
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class TelegramBot extends TelegramLongPollingBot {
     private final CreateCourseList createCourseList;
@@ -47,6 +48,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
+            log.info("Чтение файла");
             String originalMessage = update.getMessage().getText();
             String chatId = update.getMessage().getChatId().toString();
             try {
@@ -58,24 +60,28 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void handlingUserMessage(String originalMessage , String chatId) throws TelegramApiException {
+        log.info("Начало обработки входящего сообщения");
         if (originalMessage.equals("/Start")) {
             sendText(chatId , "Введитe команду:");
         } else {
             try {
                 Map<String, String> parseArguments = Parser.parseArguments(originalMessage);
                 if (parseArguments.containsKey(ERROR)) {
+                    log.info("Отправка Error Message");
                     sendText(chatId , parseArguments.get(ERROR));
                 } else {
                     command = commandMapper.MapCommand(parseArguments);
                     if (command.getOutput().equals(Output.GRAPH)) {
                         sendImage(chatId , createCourseGraph.createRatesGraph(
-                                forecasterApp.StartForecaster(command) , command.getCurrency()));
+                                forecasterApp.startForecaster(command) , command.getCurrency()));
                     } else {
                         sendText(chatId , createCourseList.createCurrencyCourseList(
-                                forecasterApp.StartForecaster(command) , command));
+                                forecasterApp.startForecaster(command) , command));
                     }
+                    log.info("Завершение обработки сообщения");
                 }
             } catch (DataErrorException e) {
+                log.info("Отправка Error Message");
                 sendText(chatId , e.getMessage() + " " + originalMessage);
             } catch (Exception ignored) {
             }

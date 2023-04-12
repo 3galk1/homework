@@ -11,8 +11,8 @@ import java.util.List;
 
 @Data
 public class LastYear implements ForecastAlgorithm {
-    private final static int FIRST_RATE = 0;
-    private final static String ERROR_MESSAGE = "Ошибка данных, отсутсвуют записи для расчета";
+    private static final int FIRST_RATE = 0;
+    private static final String ERROR_MESSAGE = "Ошибка данных, отсутсвуют записи для расчета";
     private LocalDate startDate = LocalDate.now().minusYears(1);
 
     public List<CurrencyRate> extrapolatedOnTimeRange(List<CurrencyRate> rates , Command command) throws DataErrorException {
@@ -40,7 +40,7 @@ public class LastYear implements ForecastAlgorithm {
             LocalDate currentDay = startDate;
             for (int i = 0; i < Range.WEEK.getDays(); i++) {
                 if (currentRate.getDate().equals(currentDay = currentDay.minusDays(i))) {
-                    WriteExtrapolatedRate(currentRate , rates);
+                    writeExtrapolatedRate(currentRate , rates);
                     return;
                 }
             }
@@ -48,18 +48,19 @@ public class LastYear implements ForecastAlgorithm {
         throw new DataErrorException(ERROR_MESSAGE);
     }
 
-    private LocalDate CheckDate(List<CurrencyRate> rates) {
+    private LocalDate checkDate(List<CurrencyRate> rates) {
         int firstRate = 0;
         return (rates.get(firstRate).getDate().isBefore(LocalDate.now()) ? LocalDate.now() :
                 rates.get(firstRate).getDate()).plusDays(1);
     }
 
-    private void WriteExtrapolatedRate(CurrencyRate currentRate , List<CurrencyRate> rates) {
+    private void writeExtrapolatedRate(CurrencyRate currentRate , List<CurrencyRate> rates) {
         int firstRate = 0;
-        rates.add(firstRate , new CurrencyRate(
-                currentRate.getNominal() ,
-                CheckDate(rates) ,
-                currentRate.getCourse() ,
-                currentRate.getCurrency()));
+        rates.add(firstRate , new CurrencyRate.CurrencyRateBuilder()
+                .nominal(currentRate.getNominal())
+                .date(checkDate(rates))
+                .course(currentRate.getCourse())
+                .currency(currentRate.getCurrency())
+                .build());
     }
 }

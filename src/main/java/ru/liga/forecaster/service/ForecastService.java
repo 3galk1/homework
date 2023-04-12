@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 public class ForecastService {
-    AlgorithmFactory algorithmFactory;
+    AlgorithmFactory algorithmFactory=new AlgorithmFactory();
 
     public List<CurrencyRate> forecastRate(List<CurrencyRate> rates , Command command) throws DataErrorException {
         return getExtrapolatedRate(algorithmFactory

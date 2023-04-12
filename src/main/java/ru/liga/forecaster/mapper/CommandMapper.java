@@ -2,6 +2,7 @@ package ru.liga.forecaster.mapper;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import ru.liga.forecaster.model.Command;
 import ru.liga.forecaster.model.type.*;
 
@@ -14,6 +15,7 @@ import java.util.Map;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 
+@Slf4j
 @Getter
 @Data
 public class CommandMapper {
@@ -24,6 +26,7 @@ public class CommandMapper {
     private List<Currency> currency = new ArrayList<>();
 
     public Command MapCommand(Map<String, String> arguments) {
+        log.info("Маппинг входящих аргументов");
         String[] cur = arguments.get("currency").split(",");
         List<Currency> currency = new ArrayList<>();
         for (String currentCur : cur) {
@@ -37,12 +40,14 @@ public class CommandMapper {
             date = LocalDate.parse(arguments.get("date") , formatter);
             timeRange = Range.TOMORROW;
         }
-
-        return new Command(Operation.valueOf(arguments.get("rate").toUpperCase()) ,
-                currency ,
-                timeRange ,
-                AlgorithmType.valueOf(arguments.get("alg").toUpperCase()) ,
-                Output.valueOf(arguments.get("output").toUpperCase()) ,
-                date);
+        log.info("Завершение маппинга");
+        return new Command.CommandBuilder()
+                .operation(Operation.valueOf(arguments.get("rate").toUpperCase()))
+                .currency(currency)
+                .timeRange(timeRange)
+                .algorithm(AlgorithmType.valueOf(arguments.get("alg").toUpperCase()))
+                .output(Output.valueOf(arguments.get("output").toUpperCase()))
+                .date(date)
+                .build();
     }
 }

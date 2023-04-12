@@ -21,12 +21,12 @@ public class Mystical implements ForecastAlgorithm {
 
     public List<CurrencyRate> extrapolatedOnTimeRange(List<CurrencyRate> rates , Command command) throws DataErrorException {
         for (int k = 0; k < command.getTimeRange().getDays(); k++) {
-            ExtrapolatedOnTomorrow(rates , startDate.plusDays(k));
+            extrapolatedOnTomorrow(rates , startDate.plusDays(k));
             if (mysticalRates.isEmpty()) {
                 throw new DataErrorException(ERROR_MESSAGE);
             }
             double index = Math.random() * mysticalRates.size();
-            WriteExtrapolatedRate(rates , mysticalRates , (int) index);
+            writeExtrapolatedRate(rates , mysticalRates , (int) index);
         }
         if (!command.getDate().equals(LocalDate.now())) {
             extrapolatedOnDate(rates , command);
@@ -42,7 +42,7 @@ public class Mystical implements ForecastAlgorithm {
         }
     }
 
-    private void ExtrapolatedOnTomorrow(List<CurrencyRate> rates , LocalDate startDate) {
+    private void extrapolatedOnTomorrow(List<CurrencyRate> rates , LocalDate startDate) {
         boolean isFound = false;
         for (CurrencyRate currentRate : rates) {
             LocalDate actualDate = startDate;
@@ -57,15 +57,16 @@ public class Mystical implements ForecastAlgorithm {
         }
     }
 
-    private void WriteExtrapolatedRate(List<CurrencyRate> rates , List<CurrencyRate> mysticalRates , int index) {
-        rates.add(0 , new CurrencyRate(
-                mysticalRates.get(index).getNominal() ,
-                CheckDate(rates) ,
-                mysticalRates.get(index).getCourse() ,
-                mysticalRates.get(index).getCurrency()));
+    private void writeExtrapolatedRate(List<CurrencyRate> rates , List<CurrencyRate> mysticalRates , int index) {
+        rates.add(0 , new CurrencyRate.CurrencyRateBuilder()
+                .nominal(mysticalRates.get(index).getNominal())
+                .date(checkDate(rates))
+                .course(mysticalRates.get(index).getCourse())
+                .currency(mysticalRates.get(index).getCurrency())
+                .build());
     }
 
-    private LocalDate CheckDate(List<CurrencyRate> rates) {
+    private LocalDate checkDate(List<CurrencyRate> rates) {
         int firstRate = 0;
         return (rates.get(firstRate).getDate().isBefore(LocalDate.now()) ? LocalDate.now() :
                 rates.get(firstRate).getDate()).plusDays(1);

@@ -14,4 +14,44 @@ public class CurrencyRate {
     private final BigDecimal course;
     private final String currency;
 
+    private CurrencyRate(CurrencyRateBuilder currencyRateBuilder) {
+        nominal = currencyRateBuilder.nominal;
+        date = currencyRateBuilder.date;
+        course = currencyRateBuilder.course;
+        currency = currencyRateBuilder.currency;
+    }
+
+    @Getter
+    public static class CurrencyRateBuilder {
+        private int nominal;
+        private LocalDate date;
+        private BigDecimal course;
+        private String currency;
+
+        public CurrencyRateBuilder nominal(int nominal) {
+            this.nominal = nominal;
+            return this;
+        }
+
+        public CurrencyRateBuilder date(LocalDate date) {
+            this.date = date;
+            return this;
+        }
+
+        public CurrencyRateBuilder course(BigDecimal course) {
+            this.course = course;
+            return this;
+        }
+
+        public CurrencyRateBuilder currency(String currency) {
+            this.currency = currency;
+            return this;
+        }
+
+        public CurrencyRate build() {
+            return new CurrencyRate(this);
+        }
+
+    }
+
 }

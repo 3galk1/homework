@@ -1,0 +1,4502 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "contact": {},
+    "description": "Работа с внутренними переводами (Между своими счетами, обмен валюты, клиенту Росбанка)",
+    "license": {
+      "name": "Ссылка на swagger в тестовой среде",
+      "url": "https://evo-test.rosbank.ru/swagger-ui.html#/"
+    },
+    "title": "AccountPay-API",
+    "version": "3.0.0.10"
+  },
+  "servers": [
+    {
+      "url": "https://mb-cert-api.rosbank.ru/"
+    },
+    {
+      "url": "https://mb-test-api.rosbank.ru/"
+    }
+  ],
+  "tags": [
+    {
+      "description": "Перевод со счета пользователя на счет клиента Росбанка по номеру счета",
+      "name": "ClientAccountController"
+    },
+    {
+      "description": "API модели операций для получения информации по вкладу",
+      "name": "DepositInfoController"
+    },
+    {
+      "description": "API модели операций для работы с переводами по вкладу",
+      "name": "DepositPayController"
+    },
+    {
+      "description": "API модели операций для работы с обменом валюты",
+      "name": "ExchangeController"
+    },
+    {
+      "description": "API модели операций для получения информации о счете клиента",
+      "name": "InfoController"
+    },
+    {
+      "description": "API модели операций для работы с переводами между своими счетами",
+      "name": "InternalPayController"
+    },
+    {
+      "description": "Прямой запрос на перевод между счетами клиента (доступ только из систем в контуре банка)",
+      "name": "DirectInternalPayController"
+    }
+  ],
+  "paths": {
+    "/accountpay/v3/client/account": {
+      "post": {
+        "deprecated": false,
+        "operationId": "createUsingPOST",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Ключ идемпонентности",
+            "in": "header",
+            "name": "X-Idempotence-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/anotherClientPayData"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "500": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла системная ошибка"
+          }
+        },
+        "summary": "Создание платежа.",
+        "tags": [
+          "ClientAccountController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/client/account/{paymentId}": {
+      "put": {
+        "deprecated": false,
+        "operationId": "updateUsingPUT",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Идентификатор перевода",
+            "in": "path",
+            "name": "paymentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/anotherClientPayData"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Изменение существующего платежа.",
+        "tags": [
+          "ClientAccountController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/client/account/{paymentId}/executed": {
+      "patch": {
+        "deprecated": false,
+        "operationId": "executeUsingPATCH",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Идентификатор перевода",
+            "in": "path",
+            "name": "paymentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecuteRequestDto"
+              }
+            }
+          },
+          "description": "Метод и код подтверждения",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/execDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "204": {
+            "content": {},
+            "description": "No Content"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Исполненение существующиего платежа.",
+        "tags": [
+          "ClientAccountController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/client/partialUpdate/{paymentId}": {
+      "patch": {
+        "deprecated": false,
+        "operationId": "partialUpdateUsingPATCH",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Идентификатор перевода",
+            "in": "path",
+            "name": "paymentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/anotherClientPayDataChange"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "204": {
+            "content": {},
+            "description": "No Content"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Изменение существующего платежа. Новая ручка для шаблонов",
+        "tags": [
+          "ClientAccountController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/account/accountNumber/{accountNumber}": {
+      "get": {
+        "deprecated": false,
+        "operationId": "getAccountInfoByAccountUsingGET",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "20-значный номер счёта",
+            "in": "path",
+            "name": "accountNumber",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 4081781090440001000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/accountDataByAccountResult"
+                }
+              }
+            },
+            "description": "ОК"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Invalid_request, not_supported"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          }
+        },
+        "summary": "Получение данных по счёту клиента.",
+        "tags": [
+          "InfoController"
+        ]
+      }
+    },
+    "/accountpay/v3/account/cardNumber/{cardNumber}": {
+      "get": {
+        "deprecated": false,
+        "operationId": "getAccountInfoByCardUsingGET",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Номер карты",
+            "in": "path",
+            "name": "cardNumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/accountDataByCardResult"
+                }
+              }
+            },
+            "description": "ОК"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Invalid_request, not_supported"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          }
+        },
+        "summary": "Получение данных по счёту клиента.",
+        "tags": [
+          "InfoController"
+        ]
+      }
+    },
+    "/accountpay/v3/account/payment/{paymentId}": {
+      "get": {
+        "deprecated": false,
+        "operationId": "getAccountInfoFromPaymentUsingGET",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Идентификатор платежа",
+            "in": "path",
+            "name": "paymentId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1acf4836-f71b-4d83-9e88-eda081a6ca1f"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/accountDataByAccountResult"
+                }
+              }
+            },
+            "description": "ОК"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Invalid_request, not_supported"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          }
+        },
+        "summary": "Получение данных по счёту клиента.",
+        "tags": [
+          "InfoController"
+        ]
+      }
+    },
+    "/accountpay/v3/account/phone/{phoneNumber}": {
+      "get": {
+        "deprecated": false,
+        "operationId": "getAccountInfoByPhoneUsingGET",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Номер телефона",
+            "in": "path",
+            "name": "phoneNumber",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 79507368233
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/accountDataByPhoneResult"
+                }
+              }
+            },
+            "description": "ОК"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Invalid_request, not_supported"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          }
+        },
+        "summary": "Получение данных по счёту клиента.",
+        "tags": [
+          "InfoController"
+        ]
+      }
+    },
+    "/accountpay/v3/deposit": {
+      "post": {
+        "deprecated": false,
+        "operationId": "createUsingPOST_1",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Ключ идемпонентности",
+            "in": "header",
+            "name": "X-Idempotence-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/payRequestDto"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "201": {
+            "content": {},
+            "description": "Created"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Запрос на создание перевода на счет вклада.",
+        "tags": [
+          "DepositPayController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/deposit/{accountCode}/minimumContribution": {
+      "get": {
+        "deprecated": false,
+        "operationId": "getMinimumDepositContributionUsingGET",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "13-значный номер счета",
+            "in": "path",
+            "name": "accountCode",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 79507368233
+            }
+          },
+          {
+            "allowEmptyValue": false,
+            "description": "Валюта депозита",
+            "in": "query",
+            "name": "currency",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Запрос минимальной суммы пополнения вклада.",
+        "tags": [
+          "DepositInfoController"
+        ]
+      }
+    },
+    "/accountpay/v3/deposit/{paymentId}": {
+      "put": {
+        "deprecated": false,
+        "operationId": "updateUsingPUT_1",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Идентификатор перевода",
+            "in": "path",
+            "name": "paymentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/payRequestDto"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "201": {
+            "content": {},
+            "description": "Created"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Запрос на обновление перевода на счет вклада.",
+        "tags": [
+          "DepositPayController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/deposit/{paymentId}/executed": {
+      "patch": {
+        "deprecated": false,
+        "operationId": "executeUsingPATCH_1",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Идентификатор перевода",
+            "in": "path",
+            "name": "paymentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecuteRequestDto"
+              }
+            }
+          },
+          "description": "Метод и код подтверждения",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/execDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "204": {
+            "content": {},
+            "description": "No Content"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Запрос на выполнение перевода на счет вклада.",
+        "tags": [
+          "DepositPayController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/exchange": {
+      "post": {
+        "deprecated": false,
+        "operationId": "createUsingPOST_2",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Ключ идемпонентности",
+            "in": "header",
+            "name": "X-Idempotence-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/exchangePayRequest"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/exchangePayDataResponse"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "201": {
+            "content": {},
+            "description": "Created"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {},
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Запрос на создание обмена валюты.",
+        "tags": [
+          "ExchangeController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/exchange/{currencyCodeFrom}/{currencyCodeTo}": {
+      "get": {
+        "deprecated": false,
+        "operationId": "getCurrencyRateUsingGET",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "ISO код валюты списания",
+            "in": "path",
+            "name": "currencyCodeFrom",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "RUB"
+            }
+          },
+          {
+            "description": "ISO код валюты зачисления",
+            "in": "path",
+            "name": "currencyCodeTo",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            }
+          },
+          {
+            "allowEmptyValue": false,
+            "description": "BIS ID счёта списания",
+            "in": "query",
+            "name": "sourceClientCode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "allowEmptyValue": false,
+            "description": "BIS ID счёта зачисления",
+            "in": "query",
+            "name": "targetClientCode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/currencyRateResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {},
+            "description": "Произошла функциональная ошибкамена."
+          }
+        },
+        "tags": [
+          "ExchangeController"
+        ]
+      }
+    },
+    "/accountpay/v3/exchange/{exchangeId}": {
+      "put": {
+        "deprecated": false,
+        "operationId": "updateUsingPUT_2",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Идентификатор перевода",
+            "in": "path",
+            "name": "exchangeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/exchangePayRequest"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/exchangePayDataResponse"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "201": {
+            "content": {},
+            "description": "Created"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {},
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Запрос на обновление обмена валюты.",
+        "tags": [
+          "ExchangeController"
+        ],
+        "x-codegen-request-body-name": "request"
+      },
+      "get": {
+        "tags": [
+          "ExchangeController"
+        ],
+        "summary": "Запрос на получение курсов валют",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "in": "path",
+            "name": "exchangeId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Идентификатор документа"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/exchangePaymentDtoResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "201": {
+            "content": {},
+            "description": "Created"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {},
+            "description": "Произошла функциональная ошибка"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "ExchangeController"
+        ],
+        "summary": "Запрос на создание обмена валюты по идентификатору документа черновика",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "exchangeId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Идентификатор документа"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/exchangePaymentDtoResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "201": {
+            "content": {},
+            "description": "Created"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {},
+            "description": "Произошла функциональная ошибка"
+          }
+        }
+      }
+    },
+    "/accountpay/v3/exchange/{exchangeId}/executed": {
+      "patch": {
+        "deprecated": false,
+        "operationId": "executeUsingPATCH_2",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Идентификатор перевода",
+            "in": "path",
+            "name": "exchangeId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecuteRequestDto"
+              }
+            }
+          },
+          "description": "Метод и код подтверждения",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/exchangeExecDataResult"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "204": {
+            "content": {},
+            "description": "No Content"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {},
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Запрос на выполнение обмена валюты.",
+        "tags": [
+          "ExchangeController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v4/exchange/mainCurrency": {
+      "get": {
+        "deprecated": false,
+        "operationId": "getmainCurrencyRateUsingGET",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/mainCurrencyRateResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {},
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Запрос на получение текущих курсов обмена.",
+        "tags": [
+          "ExchangeController"
+        ]
+      }
+    },
+    "/accountpay/v3/own": {
+      "post": {
+        "deprecated": false,
+        "operationId": "createUsingPOST_3",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Ключ идемпонентности",
+            "in": "header",
+            "name": "X-Idempotence-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/payRequestDto"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "201": {
+            "content": {},
+            "description": "Created"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          },
+          "500": {
+            "content": {},
+            "description": "Произошла системная ошибка"
+          }
+        },
+        "summary": "Запрос на создание перевода между своими счетами.",
+        "tags": [
+          "InternalPayController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/own/{paymentId}": {
+      "put": {
+        "deprecated": false,
+        "operationId": "updateUsingPUT_3",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Идентификатор перевода",
+            "in": "path",
+            "name": "paymentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/payRequestDto"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Запрос на обновление перевода между своими счетами.",
+        "tags": [
+          "InternalPayController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/own/partialUpdate/{paymentId}": {
+      "patch": {
+        "deprecated": false,
+        "operationId": "partialUpdateUsingPUT_3",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Идентификатор перевода",
+            "in": "path",
+            "name": "paymentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/payRequestChangeDto"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "201": {
+            "content": {},
+            "description": "Created"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Запрос на обновление перевода между своими счетами.",
+        "tags": [
+          "InternalPayController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/own/{paymentId}/executed": {
+      "patch": {
+        "deprecated": false,
+        "operationId": "executeUsingPATCH_3",
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Идентификатор перевода",
+            "in": "path",
+            "name": "paymentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecuteRequestDto"
+              }
+            }
+          },
+          "description": "Метод и код подтверждения",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/execDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "204": {
+            "content": {},
+            "description": "No Content"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          },
+          "500": {
+            "content": {},
+            "description": "Произошла системная ошибка"
+          }
+        },
+        "summary": "Запрос на выполнение перевода между своими счетами.",
+        "tags": [
+          "InternalPayController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/client/account/byTemplate/{templateId}": {
+      "post": {
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "in": "path",
+            "name": "templateId",
+            "required": true,
+            "description": "Уникальный идентификатор шаблона",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotence-Key",
+            "description": "Ключ идемпотентности",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "editedParams": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/editedParams"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "invalid_request, not_supported"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "duplicate key validation"
+          }
+        },
+        "tags": [
+          "TemplateController"
+        ]
+      }
+    },
+    "/accountpay/v3/own/byTemplate/{templateId}": {
+      "description": "Запрос на создание платежи из шаблона",
+      "post": {
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "in": "path",
+            "name": "templateId",
+            "required": true,
+            "description": "Уникальный идентификатор шаблона",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotence-Key",
+            "description": "Ключ идемпотентности",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "editedParams": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/editedParams"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "400": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "invalid_request, not_supported"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "duplicate key validation"
+          }
+        },
+        "tags": [
+          "TemplateController"
+        ]
+      }
+    },
+    "/accountpay/v3/direct/payment": {
+      "post": {
+        "deprecated": false,
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Ключ идемпонентности",
+            "in": "header",
+            "name": "X-Idempotence-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/directPayRequestDto"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "500": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла системная ошибка"
+          }
+        },
+        "summary": "Прямой запрос на создание платежа внутри банка ФЛ и между счетами.",
+        "tags": [
+          "DirectInternalPayController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/direct/payment/{paymentId}": {
+      "put": {
+        "deprecated": false,
+        "parameters": [
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "Идентификатор перевода",
+            "in": "path",
+            "name": "paymentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/directPayRequestDto"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Прямой запрос на обновление платежа.",
+        "tags": [
+          "DirectInternalPayController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/direct/payment{paymentId}": {
+      "get": {
+        "deprecated": false,
+        "parameters": [
+          {
+            "description": "Идентификатор перевода",
+            "in": "path",
+            "name": "paymentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/payDataResult"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "201": {
+            "content": {},
+            "description": "Created"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {},
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          }
+        },
+        "summary": "Запрос на получение данных по платежу.",
+        "tags": [
+          "DirectInternalPayController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    },
+    "/accountpay/v3/direct/payment/executed": {
+      "post": {
+        "deprecated": false,
+        "parameters": [
+          {
+            "description": "Ключ идемпонентности",
+            "in": "header",
+            "name": "X-Idempotence-Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Идентификаторы клиента",
+            "in": "header",
+            "name": "X-auth-user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "siebelId": "2-J-NVJLA",
+                "customerIds": [
+                  {
+                    "id": "S52429",
+                    "branch": "R19"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/directPayRequest"
+              }
+            }
+          },
+          "description": "Метод и код подтверждения",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/directPayExecutedResponse"
+                }
+              }
+            },
+            "description": "Запрос обработан"
+          },
+          "204": {
+            "content": {},
+            "description": "No Content"
+          },
+          "401": {
+            "content": {},
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {},
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description": "Произошла функциональная ошибка"
+          },
+          "500": {
+            "content": {},
+            "description": "Произошла системная ошибка"
+          }
+        },
+        "summary": "Запрос на создание и выполнение перевода между своими счетами.",
+        "tags": [
+          "DirectInternalPayController"
+        ],
+        "x-codegen-request-body-name": "request"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountDataByCardDto": {
+        "example": {
+          "branchCode": "R19",
+          "accountCode": 79507368233,
+          "fullName": "ИВАНОВ ИВАН ИВАНОВИЧ",
+          "primaryAccount": true
+        },
+        "properties": {
+          "accountCode": {
+            "type": "string"
+          },
+          "branchCode": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "primaryAccount": {
+            "type": "boolean"
+          }
+        },
+        "title": "AccountDataByCardDto",
+        "type": "object"
+      },
+      "accountDataByPhoneResult": {
+        "description": "Результат успешного запроса данных по счёту клиента",
+        "example": {
+          "result": {
+            "code": "ACCP.01001",
+            "id": 1,
+            "message": "message",
+            "status": 200,
+            "timestamp": "2000-01-23T04:56:07.000+00:00"
+          },
+          "data": {
+            "branchCode": "R19",
+            "accountCode": 79507368233,
+            "fullName": "ИВАНОВ ИВАН ИВАНОВИЧ",
+            "logo": "https://mbr-api.rosbank.ru/images/sbp/logo/100000000012.svg",
+            "bankName": "ПАО РОСБАНК"
+          }
+        },
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AccountDataByPhoneDto"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ResultDto"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "accountDataByPhoneResult",
+        "type": "object"
+      },
+      "AccountDataByPhoneDto": {
+        "example": {
+          "branchCode": "branchCode",
+          "accountCode": "accountCode",
+          "fullName": "fullName",
+          "logo": "https://mbr-api.rosbank.ru/images/sbp/logo/100000000012.svg"
+        },
+        "properties": {
+          "accountCode": {
+            "type": "string"
+          },
+          "branchCode": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "logo": {
+            "type": "string"
+          },
+          "bankName": {
+            "type": "string"
+          }
+        },
+        "title": "AccountDataByPhoneDto",
+        "type": "object"
+      },
+      "AccountDataDto": {
+        "example": {
+          "branchCode": "branchCode",
+          "accountCode": "accountCode",
+          "fullName": "fullName"
+        },
+        "properties": {
+          "accountCode": {
+            "type": "string"
+          },
+          "branchCode": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          }
+        },
+        "title": "AccountDataDto",
+        "type": "object"
+      },
+      "AdditionalAuthInfoDto": {
+        "example": {
+          "value": "value",
+          "key": "key"
+        },
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "title": "AdditionalAuthInfoDto",
+        "type": "object"
+      },
+      "ExchangePayResultDto": {
+        "example": {
+          "payeeBranch": "payeeBranch",
+          "amountBuy": 0.8008281904610115,
+          "updateDate": "2000-01-23T04:56:07.000Z",
+          "payerAccCurrency": "payerAccCurrency",
+          "commissAmount": 1.4658129805029452,
+          "amountSell": 6.027456183070403,
+          "state": "CREATED",
+          "payerBranch": "payerBranch",
+          "idempotenceKey": "idempotenceKey",
+          "commissCurrency": "commissCurrency",
+          "createDate": "2000-01-23T04:56:07.000Z",
+          "payeeAccCurrency": "payeeAccCurrency"
+        },
+        "properties": {
+          "amountBuy": {
+            "description": "Сумма покупки",
+            "type": "number"
+          },
+          "amountSell": {
+            "description": "Сумма продажи",
+            "type": "number"
+          },
+          "commissAmount": {
+            "description": "Расчетная сумма комиссии за платеж",
+            "type": "number"
+          },
+          "commissCurrency": {
+            "description": "Код валюты комиссии за платеж",
+            "type": "string"
+          },
+          "createDate": {
+            "description": "Дата и время создания",
+            "format": "date-time",
+            "type": "string"
+          },
+          "idempotenceKey": {
+            "description": "Ключ идемпотентности",
+            "type": "string"
+          },
+          "payeeAccCurrency": {
+            "description": "Валюта счёта получателя",
+            "type": "string"
+          },
+          "payeeBranch": {
+            "description": "Филиал Банка, в котором открыт счёт зачисления",
+            "type": "string"
+          },
+          "payerAccCurrency": {
+            "description": "Валюта счёта отправителя",
+            "type": "string"
+          },
+          "payerBranch": {
+            "description": "Филиал Банка, в котором открыт счёт списания",
+            "type": "string"
+          },
+          "state": {
+            "description": "Состояние перевода",
+            "enum": [
+              "CREATED",
+              "CONFIRMED",
+              "PENDING",
+              "SUSPEND",
+              "PROCESSING",
+              "FAILED",
+              "COMPLETED"
+            ],
+            "type": "string"
+          },
+          "updateDate": {
+            "description": "Дата и время последнего обновления",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amountBuy",
+          "amountSell",
+          "createDate",
+          "idempotenceKey",
+          "payeeAccCurrency",
+          "payeeBranch",
+          "payerAccCurrency",
+          "payerBranch",
+          "state"
+        ],
+        "title": "ExchangePayResultDto",
+        "type": "object"
+      },
+      "ExecuteRequestDto": {
+        "example": {
+          "authorizeMethod": "OTP",
+          "authorizeId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "authorizeCode": 123456
+        },
+        "properties": {
+          "authorizeCode": {
+            "description": "код авторизации. Если null, начинается процесс создания авторизации",
+            "type": "string"
+          },
+          "authorizeId": {
+            "description": "Идентификатор авторизации",
+            "type": "string"
+          },
+          "authorizeMethod": {
+            "description": "метод авторизации",
+            "example": "STUB",
+            "type": "string"
+          }
+        },
+        "required": [
+          "authorizeMethod"
+        ],
+        "title": "ExecuteRequestDto",
+        "type": "object"
+      },
+      "MarginRatePairDto": {
+        "example": {
+          "servicePackage": "servicePackage",
+          "clientType": "clientType",
+          "rates": [
+            {
+              "currencyFractionFrom": 0,
+              "date": "date",
+              "currencyFractionTo": 6,
+              "direct": true,
+              "rule": {
+                "maxAmountCodeFrom": 2.3021358869347655,
+                "maxAmountCodeTo": 7.061401241503109,
+                "minAmountCodeTo": 3.616076749251911,
+                "minAmountCodeFrom": 9.301444243932576
+              },
+              "currencyScaleTo": 5,
+              "priority": 5,
+              "UID": "UID",
+              "roundingRuleTo": "roundingRuleTo",
+              "currencyCodeFrom": "currencyCodeFrom",
+              "currencyCodeTo": "currencyCodeTo",
+              "roundingRuleFrom": "roundingRuleFrom",
+              "currencyScaleFrom": 1,
+              "value": 2.027123023002322
+            },
+            {
+              "currencyFractionFrom": 0,
+              "date": "date",
+              "currencyFractionTo": 6,
+              "direct": true,
+              "rule": {
+                "maxAmountCodeFrom": 2.3021358869347655,
+                "maxAmountCodeTo": 7.061401241503109,
+                "minAmountCodeTo": 3.616076749251911,
+                "minAmountCodeFrom": 9.301444243932576
+              },
+              "currencyScaleTo": 5,
+              "priority": 5,
+              "UID": "UID",
+              "roundingRuleTo": "roundingRuleTo",
+              "currencyCodeFrom": "currencyCodeFrom",
+              "currencyCodeTo": "currencyCodeTo",
+              "roundingRuleFrom": "roundingRuleFrom",
+              "currencyScaleFrom": 1,
+              "value": 2.027123023002322
+            }
+          ]
+        },
+        "properties": {
+          "clientType": {
+            "type": "string"
+          },
+          "rates": {
+            "items": {
+              "$ref": "#/components/schemas/RateWithRuleDto"
+            },
+            "type": "array"
+          },
+          "servicePackage": {
+            "type": "string"
+          }
+        },
+        "title": "MarginRatePairDto",
+        "type": "object"
+      },
+      "RateWithRuleDto": {
+        "example": {
+          "currencyFractionFrom": 0,
+          "date": "date",
+          "currencyFractionTo": 6,
+          "direct": true,
+          "rule": {
+            "maxAmountCodeFrom": 2.3021358869347655,
+            "maxAmountCodeTo": 7.061401241503109,
+            "minAmountCodeTo": 3.616076749251911,
+            "minAmountCodeFrom": 9.301444243932576
+          },
+          "currencyScaleTo": 5,
+          "priority": 5,
+          "UID": "UID",
+          "roundingRuleTo": "roundingRuleTo",
+          "currencyCodeFrom": "currencyCodeFrom",
+          "currencyCodeTo": "currencyCodeTo",
+          "roundingRuleFrom": "roundingRuleFrom",
+          "currencyScaleFrom": 1,
+          "value": 2.027123023002322
+        },
+        "properties": {
+          "UID": {
+            "type": "string"
+          },
+          "currencyCodeFrom": {
+            "type": "string"
+          },
+          "currencyCodeTo": {
+            "type": "string"
+          },
+          "currencyFractionFrom": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "currencyFractionTo": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "currencyScaleFrom": {
+            "type": "integer"
+          },
+          "currencyScaleTo": {
+            "type": "integer"
+          },
+          "date": {
+            "type": "string"
+          },
+          "direct": {
+            "type": "boolean"
+          },
+          "priority": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "roundingRuleFrom": {
+            "type": "string"
+          },
+          "roundingRuleTo": {
+            "type": "string"
+          },
+          "rule": {
+            "$ref": "#/components/schemas/RuleDto"
+          },
+          "value": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "UID",
+          "currencyCodeFrom",
+          "currencyCodeTo",
+          "currencyFractionFrom",
+          "currencyFractionTo",
+          "currencyScaleFrom",
+          "currencyScaleTo",
+          "date",
+          "direct",
+          "priority",
+          "roundingRuleFrom",
+          "roundingRuleTo",
+          "rule",
+          "value"
+        ],
+        "title": "RateWithRuleDto",
+        "type": "object"
+      },
+      "RuleDto": {
+        "example": {
+          "maxAmountCodeFrom": 2.3021358869347655,
+          "maxAmountCodeTo": 7.061401241503109,
+          "minAmountCodeTo": 3.616076749251911,
+          "minAmountCodeFrom": 9.301444243932576
+        },
+        "properties": {
+          "maxAmountCodeFrom": {
+            "type": "number"
+          },
+          "maxAmountCodeTo": {
+            "type": "number"
+          },
+          "minAmountCodeFrom": {
+            "type": "number"
+          },
+          "minAmountCodeTo": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "maxAmountCodeFrom",
+          "maxAmountCodeTo",
+          "minAmountCodeFrom",
+          "minAmountCodeTo"
+        ],
+        "title": "RuleDto",
+        "type": "object"
+      },
+      "accountDataByAccountResult": {
+        "description": "Результат успешного запроса данных по счёту клиента",
+        "example": {
+          "result": {
+            "code": "code",
+            "id": "id",
+            "message": "message",
+            "status": 1,
+            "timestamp": "2000-01-23T04:56:07.000Z"
+          },
+          "data": {
+            "branchCode": "branchCode",
+            "accountCode": "accountCode",
+            "fullName": "fullName"
+          }
+        },
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AccountDataDto"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ResultDto"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "accountDataByAccountResult",
+        "type": "object"
+      },
+      "accountDataByCardResult": {
+        "description": "Результат успешного запроса данных по счёту клиента",
+        "example": {
+          "result": {
+            "code": "code",
+            "id": "id",
+            "message": "message",
+            "status": 1,
+            "timestamp": "2000-01-23T04:56:07.000Z"
+          },
+          "data": {
+            "branchCode": "branchCode",
+            "accountCode": "accountCode",
+            "fullName": "fullName",
+            "primaryAccount": true
+          }
+        },
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AccountDataByCardDto"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ResultDto"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "accountDataByCardResult",
+        "type": "object"
+      },
+      "editedParams": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "anotherClientPayData": {
+        "description": "Данные для создания платежа",
+        "properties": {
+          "amount": {
+            "description": "Сумма платежа",
+            "type": "number",
+            "example": 100.99
+          },
+          "currency": {
+            "description": "Код валюты счёта списания",
+            "type": "string",
+            "example": "RUB"
+          },
+          "payType": {
+            "description": "Тип перевода",
+            "enum": [
+              "INTERNAL_DEPOSIT_ACCOUNT",
+              "INTERNAL_OWN_ACCOUNT",
+              "INTERNAL_BY_ACCOUNT",
+              "INTERNAL_BY_CARD",
+              "INTERNAL_BY_PHONE",
+              "INTERNAL_CURRENCY_EXCHANGE"
+            ],
+            "type": "string"
+          },
+          "payeeAccCode": {
+            "description": "Код счёта зачисления средств",
+            "type": "string",
+            "example": "9512WS7937001"
+          },
+          "payeeBranch": {
+            "description": "Филиал Банка, в котором открыт счет зачисления",
+            "type": "string",
+            "example": "R19"
+          },
+          "payeeCardCode": {
+            "description": "Номер карты получателя",
+            "type": "string",
+            "example": null
+          },
+          "payeeMobilePhone": {
+            "description": "Мобильный телефон получателя",
+            "type": "string",
+            "example": 79507368233
+          },
+          "payerAccCode": {
+            "description": "Код счёта списания средств",
+            "type": "string",
+            "example": "9512WS7937001"
+          },
+          "payerAccName": {
+            "description": "Наименование счета списания средств",
+            "type": "string",
+            "example": "Текущий счет *8899"
+          },
+          "payerBranch": {
+            "description": "Филиал Банка, в котором открыт счёт списания",
+            "type": "string",
+            "example": "R19"
+          },
+          "purpose": {
+            "description": "Сообщение получателю платежа",
+            "type": "string",
+            "example": "Другу Васе"
+          }
+        },
+        "required": [
+          "amount",
+          "currency",
+          "payeeAccCode",
+          "payeeBranch",
+          "payerAccCode",
+          "payerBranch"
+        ],
+        "title": "anotherClientPayData",
+        "type": "object"
+      },
+      "directPayRequestDto": {
+        "type": "object",
+        "description": "Данные для создания платежа",
+        "required": [
+          "payType",
+          "amount",
+          "currency",
+          "payee",
+          "payer",
+          "sendOtp"
+        ],
+        "properties": {
+          "payType": {
+            "type": "string",
+            "description": "Тип перевода",
+            "enum": [
+              "INTERNAL_OWN_ACCOUNT",
+              "INTERNAL_BY_ACCOUNT"
+            ]
+          },
+          "amount": {
+            "description": "Сумма платежа",
+            "type": "number",
+            "example": 100.99
+          },
+          "currency": {
+            "description": "Валюта платежа",
+            "type": "string",
+            "example": "RUB"
+          },
+          "payee": {
+            "type": "object",
+            "description": "Данные получателя",
+            "required": [
+              "payeeAccNumber",
+              "payeeBisId",
+              "payeeBic",
+              "payeeCorAccount",
+              "payeeFullName"
+            ],
+            "properties": {
+              "payeeAccNumber": {
+                "description": "Номер счёта зачисления средств",
+                "type": "string",
+                "example": "9512WS7937001"
+              },
+              "payeeBisId": {
+                "type": "string",
+                "description": "Идентификатор получателя в БИС",
+                "maxLength": 6,
+                "example": "S99770"
+              },
+              "payeeBranch": {
+                "type": "string",
+                "description": "Филиал пользователя",
+                "example": "R19",
+                "maxLength": 3
+              },
+              "payeeFullName": {
+                "description": "Имя получателя",
+                "type": "string",
+                "example": 32123321234
+              },
+              "payeeINN": {
+                "description": "ИНН получаетля",
+                "type": "string",
+                "example": 32123321234
+              },
+              "payeeBic": {
+                "description": "БИК получаетля",
+                "type": "string",
+                "example": 44525256
+              },
+              "payeeCorAccount": {
+                "description": "Кор счет получаетля",
+                "type": "string",
+                "example": 30101810000000000000
+              },
+              "payeeAccCurrency": {
+                "description": "Валюта счета списания средств",
+                "type": "string",
+                "example": "RUB"
+              }
+            }
+          },
+          "payer": {
+            "type": "object",
+            "description": "Данные плательщика",
+            "required": [
+              "payerAccNumber",
+              "payerBisId",
+              "payerBranch",
+              "payerFullName",
+              "payerPhoneNumber"
+            ],
+            "properties": {
+              "payerAccNumber": {
+                "description": "Номер счёта списания средств",
+                "type": "string",
+                "example": "9512WS7937001"
+              },
+              "payerAccName": {
+                "description": "Наименование счета списания средств",
+                "type": "string",
+                "example": "Текущий счет *8899"
+              },
+              "payerAccCurrency": {
+                "description": "Валюта счета списания средств",
+                "type": "string",
+                "example": "RUB"
+              },
+              "payerBisId": {
+                "type": "string",
+                "description": "Идентификатор плательщика в БИС",
+                "maxLength": 6,
+                "example": "S99770"
+              },
+              "payerBranch": {
+                "description": "Филиал Банка, в котором открыт счёт списания",
+                "type": "string",
+                "example": "R19"
+              },
+              "payerFullName": {
+                "description": "Имя плательщика",
+                "type": "string",
+                "example": "Иванов Иван Иванович"
+              },
+              "payerINN": {
+                "description": "ИНН плательщика",
+                "type": "string",
+                "example": 32123321234
+              },
+              "payerBic": {
+                "description": "БИК плательщика",
+                "type": "string",
+                "example": 44525256
+              },
+              "payerCorAccount": {
+                "description": "Кор счет плательщика",
+                "type": "string",
+                "example": 30101810000000000000
+              },
+              "payerPhoneNumber": {
+                "description": "Номер телефона плательщика",
+                "type": "string",
+                "example": 79535586789
+              }
+            }
+          },
+          "sendOtp": {
+            "type": "boolean",
+            "description": "Признак отправки ОТП",
+            "example": true
+          }
+        }
+      },
+      "directPayRequest": {
+        "type": "object",
+        "description": "Данные для создания платежа",
+        "required": [
+          "payType",
+          "amount",
+          "currency",
+          "payee",
+          "payer",
+          "sendOtp"
+        ],
+        "properties": {
+          "payType": {
+            "type": "string",
+            "description": "Тип перевода",
+            "enum": [
+              "INTERNAL_OWN_ACCOUNT",
+              "INTERNAL_BY_ACCOUNT"
+            ]
+          },
+          "amount": {
+            "description": "Сумма платежа",
+            "type": "number",
+            "example": 100.99
+          },
+          "currency": {
+            "description": "Валюта платежа",
+            "type": "string",
+            "example": "RUB"
+          },
+          "payee": {
+            "type": "object",
+            "description": "Данные получателя",
+            "required": [
+              "payeeAccNumber",
+              "payeeBisId",
+              "payeeBic",
+              "payeeCorAccount",
+              "payeeFullName"
+            ],
+            "properties": {
+              "payeeAccNumber": {
+                "description": "Номер счёта зачисления средств",
+                "type": "string",
+                "example": "9512WS7937001"
+              },
+              "payeeBisId": {
+                "type": "string",
+                "description": "Идентификатор получателя в БИС",
+                "maxLength": 6,
+                "example": "S99770"
+              },
+              "payeeBranch": {
+                "type": "string",
+                "description": "Филиал пользователя",
+                "example": "R19",
+                "maxLength": 3
+              },
+              "payeeFullName": {
+                "description": "Имя получателя",
+                "type": "string",
+                "example": 32123321234
+              },
+              "payeeINN": {
+                "description": "ИНН получаетля",
+                "type": "string",
+                "example": 32123321234
+              },
+              "payeeBic": {
+                "description": "БИК получаетля",
+                "type": "string",
+                "example": 44525256
+              },
+              "payeeCorAccount": {
+                "description": "Кор счет получаетля",
+                "type": "string",
+                "example": 30101810000000000000
+              },
+              "payeeAccCurrency": {
+                "description": "Валюта счета списания средств",
+                "type": "string",
+                "example": "RUB"
+              }
+            }
+          },
+          "payer": {
+            "type": "object",
+            "description": "Данные плательщика",
+            "required": [
+              "payerAccNumber",
+              "payerBisId",
+              "payerBranch",
+              "payerFullName",
+              "payerPhoneNumber"
+            ],
+            "properties": {
+              "payerAccNumber": {
+                "description": "Номер счёта списания средств",
+                "type": "string",
+                "example": "9512WS7937001"
+              },
+              "payerAccName": {
+                "description": "Наименование счета списания средств",
+                "type": "string",
+                "example": "Текущий счет *8899"
+              },
+              "payerAccCurrency": {
+                "description": "Валюта счета списания средств",
+                "type": "string",
+                "example": "RUB"
+              },
+              "payerBisId": {
+                "type": "string",
+                "description": "Идентификатор плательщика в БИС",
+                "maxLength": 6,
+                "example": "S99770"
+              },
+              "payerBranch": {
+                "description": "Филиал Банка, в котором открыт счёт списания",
+                "type": "string",
+                "example": "R19"
+              },
+              "payerFullName": {
+                "description": "Имя плательщика",
+                "type": "string",
+                "example": "Иванов Иван Иванович"
+              },
+              "payerINN": {
+                "description": "ИНН плательщика",
+                "type": "string",
+                "example": 32123321234
+              },
+              "payerBic": {
+                "description": "БИК плательщика",
+                "type": "string",
+                "example": 44525256
+              },
+              "payerCorAccount": {
+                "description": "Кор счет плательщика",
+                "type": "string",
+                "example": 30101810000000000000
+              },
+              "payerPhoneNumber": {
+                "description": "Номер телефона плательщика",
+                "type": "string",
+                "example": 79535586789
+              }
+            }
+          }
+        }
+      },
+      "anotherClientPayDataChange": {
+        "description": "Данные для изменения платежа",
+        "properties": {
+          "amount": {
+            "description": "Сумма платежа",
+            "type": "number",
+            "example": 1000.99
+          },
+          "currency": {
+            "description": "Код валюты счёта списания",
+            "type": "string",
+            "example": "RUB"
+          },
+          "payType": {
+            "description": "Тип перевода",
+            "enum": [
+              "INTERNAL_DEPOSIT_ACCOUNT",
+              "INTERNAL_OWN_ACCOUNT",
+              "INTERNAL_BY_ACCOUNT",
+              "INTERNAL_BY_CARD",
+              "INTERNAL_BY_PHONE",
+              "INTERNAL_CURRENCY_EXCHANGE"
+            ],
+            "type": "string"
+          },
+          "payeeAccCode": {
+            "description": "Код счёта зачисления средств",
+            "type": "string",
+            "example": "9512WS7937001"
+          },
+          "payeeBranch": {
+            "description": "Филиал Банка, в котором открыт счет зачисления",
+            "type": "string",
+            "example": "R19"
+          },
+          "payeeCardCode": {
+            "description": "Номер карты получателя",
+            "type": "string",
+            "example": null
+          },
+          "payeeMobilePhone": {
+            "description": "Мобильный телефон получателя",
+            "type": "string",
+            "example": 79507368233
+          },
+          "payerAccCode": {
+            "description": "Код счёта списания средств",
+            "type": "string",
+            "example": "9512WS7937001"
+          },
+          "payerAccName": {
+            "description": "Наименование счета списания средств",
+            "type": "string",
+            "example": "Текущий счет *8899"
+          },
+          "payerBranch": {
+            "description": "Филиал Банка, в котором открыт счёт списания",
+            "type": "string",
+            "example": "R19"
+          },
+          "purpose": {
+            "description": "Сообщение получателю платежа",
+            "type": "string",
+            "example": "Другу Васе"
+          }
+        },
+        "required": [
+          "payType"
+        ],
+        "title": "anotherClientPayDataChange",
+        "type": "object"
+      },
+      "authorizationDto": {
+        "example": {
+          "method": "OTP",
+          "createTime": "2000-01-23T04:56:07.000Z",
+          "authorizationId": "authorizationId",
+          "timeout": 6,
+          "info": [
+            {
+              "value": "value",
+              "key": "key"
+            },
+            {
+              "value": "value",
+              "key": "key"
+            }
+          ]
+        },
+        "properties": {
+          "authorizationId": {
+            "description": "Идентификатор авторизации",
+            "type": "string"
+          },
+          "createTime": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "info": {
+            "items": {
+              "$ref": "#/components/schemas/AdditionalAuthInfoDto"
+            },
+            "type": "array"
+          },
+          "method": {
+            "enum": [
+              "OTP",
+              "PIN",
+              "TOUCH",
+              "FACE"
+            ],
+            "type": "string"
+          },
+          "timeout": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "title": "authorizationDto",
+        "type": "object"
+      },
+      "currencyRateResult": {
+        "description": "Результат запроса курса валют",
+        "example": {
+          "result": {
+            "code": "code",
+            "id": "id",
+            "message": "message",
+            "status": 1,
+            "timestamp": "2000-01-23T04:56:07.000Z"
+          },
+          "data": {
+            "servicePackage": "servicePackage",
+            "clientType": "clientType",
+            "rates": [
+              {
+                "currencyFractionFrom": 0,
+                "date": "date",
+                "currencyFractionTo": 6,
+                "direct": true,
+                "rule": {
+                  "maxAmountCodeFrom": 2.3021358869347655,
+                  "maxAmountCodeTo": 7.061401241503109,
+                  "minAmountCodeTo": 3.616076749251911,
+                  "minAmountCodeFrom": 9.301444243932576
+                },
+                "currencyScaleTo": 5,
+                "priority": 5,
+                "UID": "UID",
+                "roundingRuleTo": "roundingRuleTo",
+                "currencyCodeFrom": "currencyCodeFrom",
+                "currencyCodeTo": "currencyCodeTo",
+                "roundingRuleFrom": "roundingRuleFrom",
+                "currencyScaleFrom": 1,
+                "value": 2.027123023002322
+              },
+              {
+                "currencyFractionFrom": 0,
+                "date": "date",
+                "currencyFractionTo": 6,
+                "direct": true,
+                "rule": {
+                  "maxAmountCodeFrom": 2.3021358869347655,
+                  "maxAmountCodeTo": 7.061401241503109,
+                  "minAmountCodeTo": 3.616076749251911,
+                  "minAmountCodeFrom": 9.301444243932576
+                },
+                "currencyScaleTo": 5,
+                "priority": 5,
+                "UID": "UID",
+                "roundingRuleTo": "roundingRuleTo",
+                "currencyCodeFrom": "currencyCodeFrom",
+                "currencyCodeTo": "currencyCodeTo",
+                "roundingRuleFrom": "roundingRuleFrom",
+                "currencyScaleFrom": 1,
+                "value": 2.027123023002322
+              }
+            ]
+          }
+        },
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MarginRatePairDto"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ResultDto"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "currencyRateResult",
+        "type": "object"
+      },
+      "depositInfoDataResponse": {
+        "description": "Результат обработки запроса",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/minimumContributionDto"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ResultDto"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "depositInfoDataResponse",
+        "type": "object"
+      },
+      "exchangeExecDataRequest": {
+        "description": "Данные для подтверждения платежа",
+        "example": {
+          "amountBuy": 0.8008281904610115,
+          "updateDate": "2000-01-23T04:56:07.000Z",
+          "payerAccCurrency": "payerAccCurrency",
+          "amountSell": 6.027456183070403,
+          "state": "CREATED",
+          "authorize": {
+            "method": "OTP",
+            "createTime": "2000-01-23T04:56:07.000Z",
+            "authorizationId": "authorizationId",
+            "timeout": 6,
+            "info": [
+              {
+                "value": "value",
+                "key": "key"
+              },
+              {
+                "value": "value",
+                "key": "key"
+              }
+            ]
+          },
+          "payeeAccCurrency": "payeeAccCurrency"
+        },
+        "properties": {
+          "amountBuy": {
+            "description": "Сумма покупки",
+            "type": "number"
+          },
+          "amountSell": {
+            "description": "Сумма продажи",
+            "type": "number"
+          },
+          "authorize": {
+            "$ref": "#/components/schemas/authorizationDto"
+          },
+          "payeeAccCurrency": {
+            "description": "Код валюты счета списания",
+            "type": "string"
+          },
+          "payerAccCurrency": {
+            "description": "Код валюты счета списания",
+            "type": "string"
+          },
+          "state": {
+            "description": "Состояние перевода",
+            "enum": [
+              "CREATED",
+              "CONFIRMED",
+              "PENDING",
+              "SUSPEND",
+              "PROCESSING",
+              "FAILED",
+              "COMPLETED"
+            ],
+            "type": "string"
+          },
+          "updateDate": {
+            "description": "Дата и время последнего обновления",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amountBuy",
+          "amountSell",
+          "payeeAccCurrency",
+          "payerAccCurrency",
+          "state"
+        ],
+        "title": "exchangeExecDataRequest",
+        "type": "object"
+      },
+      "exchangeExecDataResult": {
+        "description": "Результат запроса на исполнение платежа",
+        "example": {
+          "result": {
+            "code": "code",
+            "id": "id",
+            "message": "message",
+            "status": 1,
+            "timestamp": "2000-01-23T04:56:07.000Z"
+          },
+          "data": {
+            "amountBuy": 0.8008281904610115,
+            "updateDate": "2000-01-23T04:56:07.000Z",
+            "payerAccCurrency": "payerAccCurrency",
+            "amountSell": 6.027456183070403,
+            "state": "CREATED",
+            "authorize": {
+              "method": "OTP",
+              "createTime": "2000-01-23T04:56:07.000Z",
+              "authorizationId": "authorizationId",
+              "timeout": 6,
+              "info": [
+                {
+                  "value": "value",
+                  "key": "key"
+                },
+                {
+                  "value": "value",
+                  "key": "key"
+                }
+              ]
+            },
+            "payeeAccCurrency": "payeeAccCurrency"
+          }
+        },
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/exchangeExecDataRequest"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ResultDto"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "exchangeExecDataResult",
+        "type": "object"
+      },
+      "exchangePayDataResponse": {
+        "description": "Результат обработки запроса",
+        "example": {
+          "result": {
+            "code": "code",
+            "id": "id",
+            "message": "message",
+            "status": 1,
+            "timestamp": "2000-01-23T04:56:07.000Z"
+          },
+          "data": {
+            "payeeBranch": "payeeBranch",
+            "amountBuy": 0.8008281904610115,
+            "updateDate": "2000-01-23T04:56:07.000Z",
+            "payerAccCurrency": "payerAccCurrency",
+            "commissAmount": 1.4658129805029452,
+            "amountSell": 6.027456183070403,
+            "state": "CREATED",
+            "payerBranch": "payerBranch",
+            "idempotenceKey": "idempotenceKey",
+            "commissCurrency": "commissCurrency",
+            "createDate": "2000-01-23T04:56:07.000Z",
+            "payeeAccCurrency": "payeeAccCurrency"
+          }
+        },
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ExchangePayResultDto"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ResultDto"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "exchangePayDataResponse",
+        "type": "object"
+      },
+      "exchangePayRequest": {
+        "description": "Данные для создания платежа",
+        "properties": {
+          "amountBuy": {
+            "description": "Сумма покупки",
+            "type": "number"
+          },
+          "amountSell": {
+            "description": "Сумма продажи",
+            "type": "number"
+          },
+          "currencyRate": {
+            "description": "Курс обмена валюты",
+            "type": "number"
+          },
+          "currencyRateUID": {
+            "description": "Уникальный идентификатор курса валюты",
+            "type": "string"
+          },
+          "payeeAccCode": {
+            "description": "Код счёта зачисления средств",
+            "type": "string"
+          },
+          "payeeAccCurrency": {
+            "description": "Валюта счёта получателя",
+            "type": "string"
+          },
+          "payeeAccName": {
+            "description": "Наименование счета зачисления средств",
+            "type": "string"
+          },
+          "payeeBranch": {
+            "description": "Филиал Банка, в котором открыт счёт зачисления",
+            "type": "string"
+          },
+          "payerAccCode": {
+            "description": "Код счёта списания средств",
+            "type": "string"
+          },
+          "payerAccCurrency": {
+            "description": "Валюта счёта отправителя",
+            "type": "string"
+          },
+          "payerAccName": {
+            "description": "Наименование счета списания средств",
+            "type": "string"
+          },
+          "payerBranch": {
+            "description": "Филиал Банка, в котором открыт счёт списания",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amountBuy",
+          "amountSell",
+          "currencyRate",
+          "currencyRateUID",
+          "payeeAccCode",
+          "payeeAccCurrency",
+          "payeeBranch",
+          "payerAccCode",
+          "payerAccCurrency",
+          "payerBranch"
+        ],
+        "title": "exchangePayRequest",
+        "type": "object"
+      },
+      "execData": {
+        "description": "Статус платёжного поручения",
+        "example": {
+          "amount": 0.8008281904610115,
+          "updateDate": "2000-01-23T04:56:07.000Z",
+          "currency": "currency",
+          "state": "CREATED",
+          "authorize": {
+            "method": "OTP",
+            "createTime": "2000-01-23T04:56:07.000Z",
+            "authorizationId": "authorizationId",
+            "timeout": 6,
+            "info": [
+              {
+                "value": "value",
+                "key": "key"
+              },
+              {
+                "value": "value",
+                "key": "key"
+              }
+            ]
+          }
+        },
+        "properties": {
+          "amount": {
+            "description": "Сумма платежа",
+            "type": "number"
+          },
+          "authorize": {
+            "$ref": "#/components/schemas/authorizationDto"
+          },
+          "currency": {
+            "description": "Код валюты счёта списания",
+            "type": "string"
+          },
+          "state": {
+            "description": "Состояние перевода",
+            "enum": [
+              "CREATED",
+              "CONFIRMED",
+              "PENDING",
+              "SUSPEND",
+              "PROCESSING",
+              "FAILED",
+              "COMPLETED"
+            ],
+            "type": "string"
+          },
+          "updateDate": {
+            "description": "Дата и время последнего обновления",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount",
+          "currency",
+          "state",
+          "updateDate"
+        ],
+        "title": "execData",
+        "type": "object"
+      },
+      "execDataResult": {
+        "description": "Результат запроса на исполнение платежа",
+        "example": {
+          "result": {
+            "code": "INTP.01001",
+            "id": null,
+            "message": "Some result received",
+            "status": 200,
+            "timestamp": "2000-01-23T04:56:07.000Z"
+          },
+          "data": {
+            "amount": 0.8008281904610115,
+            "updateDate": "2000-01-23T04:56:07.000Z",
+            "currency": "currency",
+            "state": "CREATED",
+            "authorize": {
+              "method": "OTP",
+              "createTime": "2000-01-23T04:56:07.000Z",
+              "authorizationId": "authorizationId",
+              "timeout": 60,
+              "info": [
+                {
+                  "value": "phone",
+                  "key": "+7***9922"
+                },
+                {
+                  "value": "value",
+                  "key": "key"
+                }
+              ]
+            }
+          }
+        },
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/execData"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ResultDto"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "execDataResult",
+        "type": "object"
+      },
+      "minimumContributionDto": {
+        "properties": {
+          "accountCode": {
+            "description": "13-значный номер счета",
+            "type": "string",
+            "example": "9512WS7937001"
+          },
+          "currency": {
+            "description": "Валюта суммы",
+            "type": "string",
+            "example": "RUB"
+          },
+          "minimumContribution": {
+            "description": "Минимальная сумма платежа",
+            "type": "number",
+            "example": 5000
+          }
+        },
+        "required": [
+          "accountCode",
+          "currency",
+          "minimumContribution"
+        ],
+        "title": "minimumContributionDto",
+        "type": "object"
+      },
+      "directPayExecutedResponse": {
+        "description": "Информация о платежном поручении",
+        "type": "object",
+        "properties": {
+          "orderid": {
+            "type": "string",
+            "description": "Order object Id",
+            "format": "uuid"
+          },
+          "documentId": {
+            "type": "string",
+            "description": "Payment object ID",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string",
+            "description": "Client dbo identificator",
+            "format": "uuid"
+          },
+          "createdDate": {
+            "type": "string",
+            "description": "Order creation date-time in status CREATED",
+            "format": "date-time"
+          },
+          "updatedDate": {
+            "type": "string",
+            "description": "Order last update date-time",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "description": "Order status",
+            "enum": [
+              "created",
+              "processing",
+              "executed",
+              "failed",
+              "completed"
+            ]
+          },
+          "payerAccNumber": {
+            "type": "string",
+            "description": "Номер счета списания"
+          },
+          "payeeAccNumber": {
+            "type": "string",
+            "description": "Номер счета зачисления"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Сумма транзакции"
+          }
+        }
+      },
+      "payDataResponse": {
+        "description": "Данные результата на исполнение платежа",
+        "example": {
+          "payeeBranch": "R19",
+          "amount": 100.99,
+          "updateDate": "2000-01-23T04:56:07.000Z",
+          "commissAmount": 0.99,
+          "currency": "RUB",
+          "state": "CREATED",
+          "payerBranch": "R19",
+          "idempotenceKey": "1acf4836-f71b-4d83-9e88-eda081a6ca1f",
+          "commissCurrency": "RUB",
+          "createDate": "2000-01-23T04:56:07.000Z"
+        },
+        "properties": {
+          "amount": {
+            "description": "Сумма платежа",
+            "type": "number"
+          },
+          "commissAmount": {
+            "description": "Расчётная сумма комиссии за платёж",
+            "type": "number"
+          },
+          "commissCurrency": {
+            "description": "Код валюты комиссии за платёж",
+            "type": "string"
+          },
+          "createDate": {
+            "description": "Дата и время создания",
+            "format": "date-time",
+            "type": "string"
+          },
+          "currency": {
+            "description": "Код валюты счёта списания",
+            "type": "string"
+          },
+          "idempotenceKey": {
+            "description": "Ключ идемпотентности",
+            "type": "string"
+          },
+          "payeeBranch": {
+            "description": "Филиал Банка, в котором открыт счет зачисления",
+            "type": "string"
+          },
+          "payerBranch": {
+            "description": "Филиал Банка, в котором открыт счет списания",
+            "type": "string"
+          },
+          "state": {
+            "description": "Состояние перевода",
+            "enum": [
+              "CREATED",
+              "CONFIRMED",
+              "PENDING",
+              "SUSPEND",
+              "PROCESSING",
+              "FAILED",
+              "COMPLETED"
+            ],
+            "type": "string"
+          },
+          "updateDate": {
+            "description": "Дата и время изменения",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount",
+          "createDate",
+          "currency",
+          "idempotenceKey",
+          "payeeBranch",
+          "payerBranch",
+          "state"
+        ],
+        "title": "payDataResponse",
+        "type": "object"
+      },
+      "payDataResult": {
+        "description": "Результат обработки запроса",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/payDataResponse"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ResultDto"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "payDataResult",
+        "type": "object"
+      },
+      "payRequestDto": {
+        "description": "Данные для создания платежа",
+        "properties": {
+          "amount": {
+            "description": "Сумма платежа",
+            "type": "number",
+            "example": 1000.99
+          },
+          "currency": {
+            "description": "Код валюты счёта списания",
+            "type": "string",
+            "example": "RUB"
+          },
+          "payeeAccCode": {
+            "description": "Код счёта зачисления средств",
+            "type": "string",
+            "example": "9512WS7937001"
+          },
+          "payeeBranch": {
+            "description": "Филиал Банка, в котором открыт счет зачисления",
+            "type": "string",
+            "example": "R19"
+          },
+          "payerAccCode": {
+            "description": "Код счёта списания средств",
+            "type": "string",
+            "example": "9512WS7937001"
+          },
+          "payerAccName": {
+            "description": "Наименование счета списания средств",
+            "type": "string",
+            "example": "Текущий счет *8899"
+          },
+          "payerBranch": {
+            "description": "Филиал Банка, в котором открыт счёт списания",
+            "type": "string",
+            "example": "R19"
+          }
+        },
+        "required": [
+          "amount",
+          "currency",
+          "payeeAccCode",
+          "payeeBranch",
+          "payerAccCode",
+          "payerBranch"
+        ],
+        "title": "payRequestDto",
+        "type": "object"
+      },
+      "payRequestChangeDto": {
+        "description": "Данные для создания платежа",
+        "properties": {
+          "amount": {
+            "description": "Сумма платежа",
+            "type": "number"
+          },
+          "currency": {
+            "description": "Код валюты счёта списания",
+            "type": "string"
+          },
+          "payeeAccCode": {
+            "description": "Код счёта зачисления средств",
+            "type": "string"
+          },
+          "payeeBranch": {
+            "description": "Филиал Банка, в котором открыт счет зачисления",
+            "type": "string"
+          },
+          "payerAccCode": {
+            "description": "Код счёта списания средств",
+            "type": "string"
+          },
+          "payerAccName": {
+            "description": "Наименование счета списания средств",
+            "type": "string"
+          },
+          "payerBranch": {
+            "description": "Филиал Банка, в котором открыт счёт списания",
+            "type": "string"
+          }
+        },
+        "title": "payRequesChangetDto",
+        "type": "object"
+      },
+      "mainCurrencyRateResult": {
+        "description": "Результат запроса курса валют",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RatePairDto"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ResultDto"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "currencyRateResult",
+        "type": "object"
+      },
+      "RatePairDto": {
+        "properties": {
+          "cash": {
+            "$ref": "#/components/schemas/MainMarginRatePairDto"
+          },
+          "online": {
+            "$ref": "#/components/schemas/MainMarginRatePairDto"
+          },
+          "margin": {
+            "$ref": "#/components/schemas/MainMarginRatePairDto"
+          },
+          "actualDate": {
+            "type": "string",
+            "example": "2000-01-23T04:56:07.000"
+          },
+          "actualPeriod": {
+            "type": "string",
+            "example": "120"
+          }
+        },
+        "title": "RatePairDto",
+        "type": "object"
+      },
+      "MainMarginRatePairDto": {
+        "properties": {
+          "clientType": {
+            "type": "string"
+          },
+          "rates": {
+            "items": {
+              "$ref": "#/components/schemas/RateWithRuleDto"
+            },
+            "type": "array"
+          },
+          "servicePackage": {
+            "type": "string"
+          }
+        },
+        "title": "MarginRatePairDto",
+        "type": "object"
+      },
+      "exchangePaymentDtoResult": {
+        "type": "object",
+        "required": [
+          "id",
+          "payType",
+          "state",
+          "amountTotal",
+          "currencyRateUID",
+          "idempotenceKey"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "description": "The exchange identity"
+          },
+          "payType": {
+            "type": "string",
+            "default": "internal_currency_exchange",
+            "enum": [
+              "internal_currency_exchange",
+              "internal_own_account",
+              "internal_by_account",
+              "internal_by_card",
+              "internal_by_phone",
+              "ips_incoming_c2c",
+              "ips_outgoing_c2c",
+              "ips_incoming_c2b",
+              "ips_outgoing_c2b"
+            ]
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "created",
+              "confirmed",
+              "approved",
+              "failed"
+            ],
+            "readOnly": true
+          },
+          "intent": {
+            "type": "string",
+            "enum": [
+              "immediate",
+              "authorize"
+            ]
+          },
+          "payMethod": {
+            "type": "string",
+            "enum": [
+              "dbo_mobile_pay",
+              "dbo_web_pay",
+              "ips_pay",
+              "gorod_pay"
+            ]
+          },
+          "amountTotal": {
+            "type": "number",
+            "format": "decimal",
+            "description": "Сумма для списания со счета в копейках",
+            "example": 1234567
+          },
+          "currencyRateUID": {
+            "type": "string",
+            "description": "Уникальный идентификатор курса валюты"
+          },
+          "templateId": {
+            "type": "string"
+          },
+          "currencyRate": {
+            "type": "number",
+            "format": "decimal",
+            "description": "Курс обмена валюты",
+            "example": 66.6
+          },
+          "payer": {
+            "type": "object",
+            "required": [
+              "payerID",
+              "payerAbsCode",
+              "payerCrmCode",
+              "payerBranch",
+              "instrumentNum"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "verified",
+                  "unverified"
+                ],
+                "readOnly": true
+              },
+              "firstName": {
+                "type": "string"
+              },
+              "middleName": {
+                "type": "string"
+              },
+              "lastName": {
+                "type": "string"
+              },
+              "legalName": {
+                "type": "string"
+              },
+              "payerId": {
+                "type": "string",
+                "format": "uuid",
+                "description": "userId - идентификатор пользователя ДБО",
+                "maxLength": 36
+              },
+              "payerAbsCode": {
+                "type": "string",
+                "description": "Идентификатор пользователя Bis ID",
+                "maxLength": 6,
+                "example": "S99770"
+              },
+              "payerCrmCode": {
+                "type": "string",
+                "description": "Идентификатор пользователя Siebel ID",
+                "example": "2-J-NYVF4",
+                "maxLength": 15
+              },
+              "payerServicePackage": {
+                "type": "string",
+                "description": "Код ПБУ (пакет банковских услуг клиента)"
+              },
+              "payerMarketSegment": {
+                "type": "string",
+                "description": "Код ПБУ (Сегмент клиента)"
+              },
+              "payerBankIdCode": {
+                "type": "string"
+              },
+              "payerBranch": {
+                "type": "string",
+                "description": "Филиал пользователя",
+                "example": "R19",
+                "maxLength": 3
+              },
+              "instrumentType": {
+                "type": "string",
+                "default": "bank_account",
+                "enum": [
+                  "bank_account",
+                  "payment_card"
+                ]
+              },
+              "instrumentName": {
+                "type": "string",
+                "description": "Наименование счета"
+              },
+              "instrumentNum": {
+                "type": "string"
+              },
+              "instrumentCode": {
+                "type": "string"
+              },
+              "instrumentCurrency": {
+                "type": "string",
+                "description": "ISO 3 буквенный код валюты счета списания",
+                "example": "RUB"
+              },
+              "personTin": {
+                "type": "string"
+              },
+              "personMtel": {
+                "type": "string"
+              },
+              "personPam": {
+                "type": "string"
+              }
+            }
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "withdrawal",
+                    "reward"
+                  ]
+                },
+                "amount": {
+                  "type": "number",
+                  "format": "decimal",
+                  "description": "Сумма транзакции в копейках",
+                  "example": 1234567
+                },
+                "amountPrice": {
+                  "type": "number",
+                  "format": "decimal",
+                  "description": "Параметры транзакции (курс обмена / способ расчета комиссии)"
+                },
+                "currency": {
+                  "type": "string",
+                  "format": "currency",
+                  "description": "3 char currency code"
+                },
+                "invoiceNum": {
+                  "type": "string"
+                },
+                "purpose": {
+                  "type": "string"
+                },
+                "payee": {
+                  "type": "object",
+                  "required": [
+                    "payeeId",
+                    "payeeAbsCode",
+                    "payeeCrmCode",
+                    "payeeBankIdCode",
+                    "payeeBranch",
+                    "instrumentNum"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "verified",
+                        "unverified"
+                      ],
+                      "readOnly": true
+                    },
+                    "firstName": {
+                      "type": "string"
+                    },
+                    "middleName": {
+                      "type": "string"
+                    },
+                    "lastName": {
+                      "type": "string"
+                    },
+                    "legalName": {
+                      "type": "string"
+                    },
+                    "payeeId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "userId - идентификатор получателя ДБО",
+                      "maxLength": 36
+                    },
+                    "payeeAbsCode": {
+                      "type": "string",
+                      "description": "Идентификатор получателя Bis ID",
+                      "maxLength": 6,
+                      "example": "S99770"
+                    },
+                    "payeeCrmCode": {
+                      "type": "string",
+                      "description": "Идентификатор получателя Siebel ID",
+                      "example": "2-J-NYVF4",
+                      "maxLength": 15
+                    },
+                    "payeeBankIdCode": {
+                      "type": "string"
+                    },
+                    "payeeBranch": {
+                      "type": "string",
+                      "description": "Филиал получателя",
+                      "example": "R19",
+                      "maxLength": 3
+                    },
+                    "instrumentType": {
+                      "type": "string",
+                      "default": "bank_account",
+                      "enum": [
+                        "bank_account",
+                        "payment_card"
+                      ]
+                    },
+                    "instrumentName": {
+                      "type": "string",
+                      "description": "Наименование счета"
+                    },
+                    "instrumentNum": {
+                      "type": "string"
+                    },
+                    "instrumentCode": {
+                      "type": "string",
+                      "description": "sfsfds"
+                    },
+                    "instrumentCurrency": {
+                      "type": "string",
+                      "description": "ISO 3 буквенный код валюты счета зачисления",
+                      "example": "RUB"
+                    },
+                    "personTin": {
+                      "type": "string"
+                    },
+                    "personMtel": {
+                      "type": "string"
+                    },
+                    "personPam": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "idempotenceKey": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updateDate": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        }
+      },
+      "ResultDto": {
+        "example": {
+          "code": "INTP.00001",
+          "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "message": "Some result in response",
+          "status": 200,
+          "timestamp": "2000-01-23T04:56:07.000Z"
+        },
+        "properties": {
+          "code": {
+            "description": "Код результата обработки запроса (10 символов вида DDDD.ddddd)",
+            "type": "string"
+          },
+          "id": {
+            "description": "Идентификатор ответа",
+            "type": "string"
+          },
+          "message": {
+            "description": "Описание кода обработки запроса",
+            "type": "string"
+          },
+          "status": {
+            "description": "Http-статус ответа",
+            "format": "int32",
+            "type": "integer"
+          },
+          "timestamp": {
+            "description": "Время ответа",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "status"
+        ],
+        "title": "ResultDto",
+        "type": "object"
+      }
+    }
+  }
+}
